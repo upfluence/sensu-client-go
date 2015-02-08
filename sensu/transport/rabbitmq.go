@@ -34,7 +34,7 @@ func (t *RabbitMQTransport) Connect() error {
 		return err
 	}
 
-	log.Println("RabbitMQ connection and channel opened")
+	log.Printf("RabbitMQ connection and channel opened to %s", t.URI)
 
 	return nil
 
@@ -81,12 +81,14 @@ func (t *RabbitMQTransport) Subscribe(key, exchangeName, queueName string, messa
 	}
 
 	if _, err := t.Channel.QueueDeclare(queueName, false, true, false, false, nil); err != nil {
+		log.Printf("Can't declare the queue: %s", err.Error())
 		return err
 	}
 
 	log.Printf("Queue %s declared", queueName)
 
 	if err := t.Channel.QueueBind(queueName, key, exchangeName, false, nil); err != nil {
+		log.Printf("Can't bind the queue: %s", err.Error())
 		return err
 	}
 
@@ -97,6 +99,7 @@ func (t *RabbitMQTransport) Subscribe(key, exchangeName, queueName string, messa
 	log.Printf("Consuming the queue %s", queueName)
 
 	if err != nil {
+		log.Printf("Can't consume the queue: %s", err.Error())
 		return err
 	}
 
