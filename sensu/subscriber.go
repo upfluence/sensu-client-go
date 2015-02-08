@@ -22,6 +22,9 @@ func (s *Subscriber) SetClient(c *Client) error {
 }
 
 func (s *Subscriber) Start() error {
+	var output check.CheckOutput
+	var b []byte
+
 	funnel := strings.Join(
 		[]string{
 			s.Client.Config.Name(),
@@ -38,8 +41,6 @@ func (s *Subscriber) Start() error {
 
 	log.Printf("Subscribed to %s", s.Subscription)
 
-	var b []byte
-
 	for {
 		b = <-msgChan
 
@@ -48,7 +49,11 @@ func (s *Subscriber) Start() error {
 		log.Printf("Check received : %s", bytes.NewBuffer(b).String())
 		json.Unmarshal(b, &payload)
 
-		output := (&check.ExternalCheck{payload["command"].(string)}).Execute()
+		if ch, ok := check.Store[payload["name"].(string)]; ok {
+			output = ch.Execute()
+		} else {
+			output = (&check.ExternalCheck{payload["command"].(string)}).Execute()
+		}
 
 		p, err := json.Marshal(s.forgeCheckResponse(payload, &output))
 
