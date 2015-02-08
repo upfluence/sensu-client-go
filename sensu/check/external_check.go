@@ -1,4 +1,4 @@
-package sensu
+package check
 
 import (
 	"bytes"
@@ -8,19 +8,12 @@ import (
 	"time"
 )
 
-type Check struct {
-	Payload map[string]interface{}
+type ExternalCheck struct {
+	Command string
 }
 
-type CheckOutput struct {
-	Status   int
-	Output   string
-	Duration float64
-	Executed int64
-}
-
-func (c *Check) Execute() CheckOutput {
-	command := strings.Split(c.Payload["command"].(string), " ")
+func (c *ExternalCheck) Execute() CheckOutput {
+	command := strings.Split(c.Command, " ")
 
 	t0 := time.Now()
 	cmd := exec.Command(command[0], command[1:]...)
