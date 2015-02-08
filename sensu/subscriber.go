@@ -30,9 +30,6 @@ func (s *Subscriber) Start() error {
 		"-",
 	)
 
-	log.Println(s.Subscription)
-	log.Println(funnel)
-
 	msgChan := make(chan []byte)
 	stopChan := make(chan bool)
 
@@ -41,7 +38,6 @@ func (s *Subscriber) Start() error {
 	log.Printf("Subscribed to %s", s.Subscription)
 
 	var b []byte
-	log.Println(&msgChan)
 
 	for {
 		b = <-msgChan
