@@ -49,11 +49,15 @@ func (s *Subscriber) Start() error {
 		log.Printf("Check received : %s", bytes.NewBuffer(b).String())
 		json.Unmarshal(b, &payload)
 
+		if _, ok := payload["name"]; !ok {
+			log.Printf("The name field is not filled")
+			continue
+		}
+
 		if ch, ok := check.Store[payload["name"].(string)]; ok {
 			output = ch.Execute()
 		} else if _, ok := payload["command"]; !ok {
 			log.Printf("The command field is not filled")
-
 			continue
 		} else {
 			output = (&check.ExternalCheck{payload["command"].(string)}).Execute()
