@@ -39,31 +39,16 @@ func (s *Subscriber) Start() error {
 		"-",
 	)
 
-	msgChan := make(chan []byte)
-	stopChan := make(chan bool)
-
-	go s.Client.Transport.Subscribe("#", s.Subscription, funnel, msgChan, stopChan)
-
+	msgChan, stopChan := s.subscribe(funnel)
 	log.Printf("Subscribed to %s", s.Subscription)
 
 	failures := 0
-
 	for {
 		if failures >= MAX_FAILS {
-			stopChan <- true
-			msgChan = make(chan []byte)
 			failures = 0
-			s.Client.Transport.Close()
+			stopChan <- true
 			time.Sleep(MAX_TIME)
-			s.Client.Transport.Connect()
-			go s.Client.Transport.Subscribe(
-				"#",
-				s.Subscription,
-				funnel,
-				msgChan,
-				stopChan,
-			)
-
+			msgChan, stopChan = s.subscribe(funnel)
 		}
 
 		b = <-msgChan
@@ -100,6 +85,19 @@ func (s *Subscriber) Start() error {
 	}
 
 	return nil
+}
+
+func (s *Subscriber) subscribe(funnel string) (chan []byte, chan bool) {
+	msgChan := make(chan []byte)
+	stopChan := make(chan bool)
+	go s.Client.Transport.Subscribe(
+		"#",
+		s.Subscription,
+		funnel,
+		msgChan,
+		stopChan,
+	)
+	return msgChan, stopChan
 }
 
 func (s *Subscriber) forgeCheckResponse(payload map[string]interface{}, output *check.CheckOutput) map[string]interface{} {
