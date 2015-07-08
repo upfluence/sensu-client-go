@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+const (
+	MAX_FAILS = 100
+	MAX_TIME  = 60 * time.Second
+)
+
 type Subscriber struct {
 	Subscription string
 	Client       *Client
@@ -41,7 +46,24 @@ func (s *Subscriber) Start() error {
 
 	log.Printf("Subscribed to %s", s.Subscription)
 
+	failures := 0
+
 	for {
+		if failures >= MAX_FAILS {
+			stopChan <- true
+			msgChan = make(chan []byte)
+			failures = 0
+			time.Sleep(MAX_TIME)
+			go s.Client.Transport.Subscribe(
+				"#",
+				s.Subscription,
+				funnel,
+				msgChan,
+				stopChan,
+			)
+
+		}
+
 		b = <-msgChan
 
 		payload := make(map[string]interface{})
@@ -51,6 +73,7 @@ func (s *Subscriber) Start() error {
 
 		if _, ok := payload["name"]; !ok {
 			log.Printf("The name field is not filled")
+			failures++
 			continue
 		}
 
