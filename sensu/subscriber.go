@@ -53,7 +53,9 @@ func (s *Subscriber) Start() error {
 			stopChan <- true
 			msgChan = make(chan []byte)
 			failures = 0
+			s.Client.Transport.Close()
 			time.Sleep(MAX_TIME)
+			s.Client.Transport.Connect()
 			go s.Client.Transport.Subscribe(
 				"#",
 				s.Subscription,
