@@ -2,8 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"github.com/upfluence/sensu-client-go/sensu/check"
+	"strings"
 	"time"
+
+	"github.com/upfluence/sensu-client-go/sensu/check"
 )
 
 type Point struct {
@@ -24,11 +26,11 @@ func (m *Metric) AddPoint(p Point) {
 }
 
 func (m *Metric) Render() check.ExtensionCheckResult {
-	output := ""
+	output := []string{}
 
 	for _, p := range m.Points {
-		output = fmt.Sprintf("%s\n%s", output, p.Render())
+		output = append(output, p.Render())
 	}
 
-	return check.ExtensionCheckResult{0, output}
+	return check.ExtensionCheckResult{0, strings.Join(output, "\n")}
 }
