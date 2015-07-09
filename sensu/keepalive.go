@@ -8,7 +8,12 @@ import (
 )
 
 type KeepAlive struct {
-	Client *Client
+	Client    *Client
+	closeChan chan bool
+}
+
+func NewKeepAlive() *KeepAlive {
+	return &KeepAlive{nil, make(chan bool)}
 }
 
 func (k *KeepAlive) SetClient(c *Client) error {
@@ -50,9 +55,17 @@ func (k *KeepAlive) Start() error {
 	k.PublishKeepAlive()
 
 	for {
-		<-t
-		k.PublishKeepAlive()
+		select {
+		case <-t:
+			k.PublishKeepAlive()
+		case <-k.closeChan:
+			return nil
+		}
 	}
 
 	return nil
+}
+
+func (k *KeepAlive) Close() {
+	k.closeChan <- true
 }

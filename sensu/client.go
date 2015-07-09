@@ -4,50 +4,77 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 )
 
-const CurrentVersion string = "0.0.1"
+const (
+	CurrentVersion     string        = "0.0.1"
+	CONNECTION_TIMEOUT time.Duration = 5 * time.Second
+)
 
 type Client struct {
-	Transport  Transport
-	Processors []Processor
-	Config     *Config
+	Transport Transport
+	Config    *Config
 }
 
 func NewClient(transport Transport, cfg *Config) *Client {
-	processors := []Processor{}
-
-	for _, s := range cfg.Subscriptions() {
-		processors = append(processors, &Subscriber{s, nil})
-	}
 
 	client := Client{
 		transport,
-		append(processors, &KeepAlive{}),
 		cfg,
-	}
-
-	for _, processor := range client.Processors {
-		processor.SetClient(&client)
 	}
 
 	return &client
 }
 
-func (c *Client) Start() error {
-	c.Transport.Connect()
+func (c *Client) buildProcessors() []Processor {
+	processors := []Processor{NewKeepAlive()}
 
-	for _, processor := range c.Processors {
-		go processor.Start()
+	for _, s := range c.Config.Subscriptions() {
+		processors = append(processors, NewSubscriber(s))
 	}
 
-	sig := make(chan os.Signal)
+	for _, processor := range processors {
+		processor.SetClient(c)
+	}
 
+	return processors
+}
+
+func (c *Client) Start() error {
+	sig := make(chan os.Signal)
 	signal.Notify(sig, os.Kill, os.Interrupt)
 
-	s := <-sig
+	for {
+		c.Transport.Connect()
 
-	log.Printf("Signal %s received", s.String())
+		for !c.Transport.IsConnected() {
+			time.Sleep(CONNECTION_TIMEOUT)
+			c.Transport.Connect()
+		}
 
-	return c.Transport.Close()
+		processors := c.buildProcessors()
+		for _, processor := range processors {
+			go processor.Start()
+		}
+
+		select {
+		case s := <-sig:
+			log.Printf("Signal %s received", s.String())
+
+			for _, processor := range processors {
+				processor.Close()
+			}
+
+			return c.Transport.Close()
+		case <-c.Transport.GetClosingChan():
+			log.Println("Transport disconnected")
+
+			for _, processor := range processors {
+				processor.Close()
+			}
+
+			c.Transport.Close()
+		}
+	}
 }
