@@ -85,14 +85,29 @@ func (t *RabbitMQTransport) Subscribe(key, exchangeName, queueName string, messa
 		return errors.New("The channel is not opened")
 	}
 
-	if err := t.Channel.ExchangeDeclare(exchangeName, "direct", false, false, false, false, amqp.Table{}); err != nil {
+	if err := t.Channel.ExchangeDeclare(
+		exchangeName,
+		"fanout",
+		false,
+		false,
+		false,
+		false,
+		amqp.Table{},
+	); err != nil {
 		log.Printf("Can't declare the exchange: %s", err.Error())
 		return err
 	}
 
 	log.Printf("Exchange %s declared", exchangeName)
 
-	if _, err := t.Channel.QueueDeclare(queueName, false, true, false, false, nil); err != nil {
+	if _, err := t.Channel.QueueDeclare(
+		queueName,
+		false,
+		true,
+		false,
+		false,
+		nil,
+	); err != nil {
 		log.Printf("Can't declare the queue: %s", err.Error())
 		return err
 	}
