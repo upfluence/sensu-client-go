@@ -67,7 +67,7 @@ func (c *Config) Name() string {
 }
 
 func (c *Config) Address() string {
-	address := os.Getenv("SENSU_CLIENT_ADDRESS")
+	address := os.Getenv("SENSU_ADDRESS")
 
 	if address == "" && c.config["address"] != nil {
 		address = c.config["address"].(string)
