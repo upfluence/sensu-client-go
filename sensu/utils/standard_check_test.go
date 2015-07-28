@@ -37,7 +37,7 @@ func TestEnvVarMalformed(t *testing.T) {
 func TestEnvVarOk(t *testing.T) {
 	os.Setenv("FUZ", "28")
 
-	if v := EnvironmentValueOrConst("HOSTNAME", 28.0); v != 28.0 {
+	if v := EnvironmentValueOrConst("FUZ", 21.0); v != 28.0 {
 		t.Errorf("Wrong value returned %f", v)
 	}
 }
