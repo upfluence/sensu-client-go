@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CurrentVersion     string        = "0.0.1"
+	CurrentVersion     string        = "0.1.0-dev"
 	CONNECTION_TIMEOUT time.Duration = 5 * time.Second
 )
 
