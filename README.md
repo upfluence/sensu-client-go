@@ -1,6 +1,8 @@
 # Sensu Client
   Portable / Embeddable lighweight version of the sensu client
 
+[![Circle CI](https://circleci.com/gh/upfluence/sensu-client-go.svg?style=svg)](https://circleci.com/gh/upfluence/sensu-client-go)
+
 ## Usage
 
 You can use this project by two different ways.
