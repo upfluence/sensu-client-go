@@ -22,19 +22,20 @@ func (c *ExternalCheck) Execute() CheckOutput {
 
 	if err := cmd.Start(); err != nil {
 		return CheckOutput{
-			127,
-			err.Error(), time.Now().Sub(t0).Seconds(),
+			Error,
+			err.Error(),
+			time.Now().Sub(t0).Seconds(),
 			t0.Unix(),
 		}
 	}
 
-	status := 0
+	status := Success
 
 	if err := cmd.Wait(); err != nil {
-		status = 127
+		status = Error
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			if statusReturn, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				status = int(statusReturn)
+				status = ExitStatus(statusReturn)
 			}
 		}
 	}

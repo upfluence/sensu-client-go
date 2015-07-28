@@ -3,7 +3,7 @@ package check
 import "time"
 
 type ExtensionCheckResult struct {
-	Status int
+	Status ExitStatus
 	Output string
 }
 

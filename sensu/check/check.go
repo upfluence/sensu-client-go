@@ -1,7 +1,15 @@
 package check
 
+type ExitStatus uint8
+
+const (
+	Success ExitStatus = iota
+	Warning
+	Error
+)
+
 type CheckOutput struct {
-	Status   int
+	Status   ExitStatus
 	Output   string
 	Duration float64
 	Executed int64
