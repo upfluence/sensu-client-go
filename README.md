@@ -185,7 +185,6 @@ variables:
 
 ## Roadmap
 
-* [ ] Implement some metrics check helper
 * [ ] Implement the keep-alives specific configurations (thresholds and
   hanlder)
 * [ ] Implement the standalone check mechanism
