@@ -43,8 +43,12 @@ Then you just have to run the program as `./sensu-client -c /etc/sensu/config.js
 
 ### Subpackage
 
-You just have to use the tools packaged into this repository. Hereby an
-example:
+#### Barebone check
+
+If you want to write a simple check you just have to write a function
+with zero argument and which returns a check.ExtensionCheckResult. Wrap
+this function pointer into an `check.ExtensionCheck` and add it into the
+`check.Store` map with check name as key,  such as:
 
 ```golang
 package main
@@ -85,7 +89,65 @@ func main() {
 }
 ```
 
-Then, just compile it and run it, such as:
+#### Standard check
+
+If you want to write a check and a metric which inspect the same value
+you can use the `StandardCheck` struct from the `github.com/upfluence/sensu-client-go/sensu/handler`
+package. Such as:
+
+```golang
+package main
+
+import (
+  "net/http"
+  "time"
+	"github.com/upfluence/sensu-client-go/sensu"
+	"github.com/upfluence/sensu-client-go/sensu/check"
+	"github.com/upfluence/sensu-client-go/sensu/transport"
+	"github.com/upfluence/sensu-client-go/sensu/utils"
+)
+
+func HTTPCallDuration() float64 {
+  t0 = time.Now().Unix()
+  resp, err := http.Get("http://example.com/")
+
+  return float64(time.Now().Unix() - t0)
+}
+
+func main() {
+  c := &utils.StandardCheck{
+    ErrorThreshold: 20.0,
+    WarningThreshold: 10.0,
+    MetricName: "http_call.duration",
+    Value: HTTPCallDuration,
+    CheckMessage: func(v float64) string {
+      return fmt.Sprintf("Duration: %.2fs", v)
+    },
+  }
+
+	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
+
+	t := transport.NewRabbitMQTransport(cfg)
+	client := sensu.NewClient(t, cfg)
+
+	check.Store["http_duration_check"] = &check.ExtensionCheck{c.Check}
+	check.Store["http_duration_metric"] = &check.ExtensionCheck{c.Metric}
+
+	client.Start()
+}
+```
+
+If the duration exceed 20s the `http_duration_check` will return an
+Error, if the duration exceed 10s the check will return a warning
+otherwise it will returns an "OK" code.
+
+The `http_duration_metric` will return `http_call_duration 5.000000 1438125085`
+
+with 5.0 as the duration of the HTTP call and 1438125085 the timestamp
+
+### Running
+
+You just have to compile it and execute it, such as:
 
 ```shell
 $ ls
