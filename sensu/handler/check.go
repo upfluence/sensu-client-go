@@ -6,13 +6,22 @@ import (
 )
 
 func Ok(message string) check.ExtensionCheckResult {
-	return check.ExtensionCheckResult{0, fmt.Sprintf("OK: %s", message)}
+	return check.ExtensionCheckResult{
+		check.Success,
+		fmt.Sprintf("OK: %s", message),
+	}
 }
 
 func Warning(message string) check.ExtensionCheckResult {
-	return check.ExtensionCheckResult{1, fmt.Sprintf("WARNING: %s", message)}
+	return check.ExtensionCheckResult{
+		check.Warning,
+		fmt.Sprintf("WARNING: %s", message),
+	}
 }
 
 func Error(message string) check.ExtensionCheckResult {
-	return check.ExtensionCheckResult{2, fmt.Sprintf("ERROR: %s", message)}
+	return check.ExtensionCheckResult{
+		check.Error,
+		fmt.Sprintf("ERROR: %s", message),
+	}
 }
