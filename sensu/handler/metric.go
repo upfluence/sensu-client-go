@@ -14,14 +14,14 @@ type Point struct {
 }
 
 type Metric struct {
-	Points []Point
+	Points []*Point
 }
 
 func (p Point) Render() string {
 	return fmt.Sprintf("%s %f %d", p.Name, p.Value, time.Now().Unix())
 }
 
-func (m *Metric) AddPoint(p Point) {
+func (m *Metric) AddPoint(p *Point) {
 	m.Points = append(m.Points, p)
 }
 
@@ -32,5 +32,5 @@ func (m *Metric) Render() check.ExtensionCheckResult {
 		output = append(output, p.Render())
 	}
 
-	return check.ExtensionCheckResult{0, strings.Join(output, "\n")}
+	return check.ExtensionCheckResult{check.Success, strings.Join(output, "\n")}
 }
