@@ -24,13 +24,17 @@ type StandardCheck struct {
 	// The metric name sent to the server
 	MetricName string
 	// Function to compute the value along the checks
-	Value func() float64
+	Value func() (float64, error)
 	// Used to render the output message of the check
 	CheckMessage func(float64) string
 }
 
 func (c *StandardCheck) Check() check.ExtensionCheckResult {
-	v := c.Value()
+	v, err := c.Value()
+
+	if err != nil {
+		return handler.Error(err.Error())
+	}
 
 	if v > c.ErrorThreshold {
 		return handler.Error(c.CheckMessage(v))
@@ -44,7 +48,10 @@ func (c *StandardCheck) Check() check.ExtensionCheckResult {
 func (c *StandardCheck) Metric() check.ExtensionCheckResult {
 	m := &handler.Metric{}
 
-	m.AddPoint(&handler.Point{c.MetricName, c.Value()})
+	v, err := c.Value()
 
+	if err == nil {
+		m.AddPoint(&handler.Point{c.MetricName, v})
+	}
 	return m.Render()
 }
