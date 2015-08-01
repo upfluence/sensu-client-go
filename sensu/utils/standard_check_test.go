@@ -15,15 +15,18 @@ var (
 	meth2    = func() (float64, error) { return 1.9, nil }
 	meth3    = func() (float64, error) { return 2.9, nil }
 	failMeth = func() (float64, error) { return 0.0, errors.New("Foo Bar") }
+	asc      = func(x, y float64) bool { return x < y }
+	desc     = func(x, y float64) bool { return x > y }
 
 	messMeth = func(f float64) string {
 		return fmt.Sprintf("messMeth: %.2f", f)
 	}
 
-	okCheck      = &StandardCheck{2.0, 1.0, "ok", meth1, messMeth}
-	warningCheck = &StandardCheck{2.0, 1.0, "warn", meth2, messMeth}
-	errCheck     = &StandardCheck{2.0, 1.0, "err", meth3, messMeth}
-	failCheck    = &StandardCheck{2.0, 1.0, "ok", failMeth, messMeth}
+	okCheck        = &StandardCheck{2.0, 1.0, "ok", meth1, messMeth, asc}
+	warningCheck   = &StandardCheck{2.0, 1.0, "warn", meth2, messMeth, asc}
+	errCheck       = &StandardCheck{2.0, 1.0, "err", meth3, messMeth, asc}
+	errInvertCheck = &StandardCheck{2.0, 1.0, "err", meth1, messMeth, desc}
+	failCheck      = &StandardCheck{2.0, 1.0, "ok", failMeth, messMeth, asc}
 )
 
 func TestEnvVarEmpty(t *testing.T) {
@@ -78,6 +81,18 @@ func TestStandardCheckError(t *testing.T) {
 	}
 
 	if v.Output != "ERROR: messMeth: 2.90" {
+		t.Errorf("Wrong message: %s", v.Output)
+	}
+}
+
+func TestStandardCheckInvertError(t *testing.T) {
+	v := errInvertCheck.Check()
+
+	if v.Status != check.Error {
+		t.Errorf("Wrong status: %d", v.Status)
+	}
+
+	if v.Output != "ERROR: messMeth: 0.90" {
 		t.Errorf("Wrong message: %s", v.Output)
 	}
 }

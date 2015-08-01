@@ -110,11 +110,11 @@ import (
 	"github.com/upfluence/sensu-client-go/sensu/utils"
 )
 
-func HTTPCallDuration() float64 {
+func HTTPCallDuration() (float64, err) {
 	t0 := time.Now().Unix()
 	resp, err := http.Get("http://example.com/")
 
-	return float64(time.Now().Unix() - t0)
+	return float64(time.Now().Unix() - t0), err
 }
 
 func main() {
@@ -126,6 +126,7 @@ func main() {
 		CheckMessage: func(v float64) string {
 			return fmt.Sprintf("Duration: %.2fs", v)
 		},
+    Comp:             func(x,y float64) bool { return x > y }
 	}
 
 	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
