@@ -49,8 +49,12 @@ func (c *Client) Start() error {
 		c.Transport.Connect()
 
 		for !c.Transport.IsConnected() {
-			time.Sleep(CONNECTION_TIMEOUT)
-			c.Transport.Connect()
+			select {
+			case <-time.After(CONNECTION_TIMEOUT):
+				c.Transport.Connect()
+			case <-sig:
+				return c.Transport.Close()
+			}
 		}
 
 		processors := c.buildProcessors()
