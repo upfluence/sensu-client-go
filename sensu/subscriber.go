@@ -3,11 +3,13 @@ package sensu
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/upfluence/sensu-client-go/sensu/check"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/upfluence/sensu-client-go/sensu/check"
+	stdCheck "github.com/upfluence/sensu-go/sensu/check"
 )
 
 const (
@@ -21,14 +23,8 @@ type Subscriber struct {
 	closeChan    chan bool
 }
 
-func NewSubscriber(subscription string) *Subscriber {
-	return &Subscriber{subscription, nil, make(chan bool)}
-}
-
-func (s *Subscriber) SetClient(c *Client) error {
-	s.Client = c
-
-	return nil
+func NewSubscriber(subscription string, c *Client) *Subscriber {
+	return &Subscriber{subscription, c, make(chan bool)}
 }
 
 func (s *Subscriber) Start() error {
@@ -63,7 +59,7 @@ func (s *Subscriber) Close() {
 }
 
 func (s *Subscriber) handleMessage(blob []byte) {
-	var output check.CheckOutput
+	var output stdCheck.CheckOutput
 	payload := make(map[string]interface{})
 
 	log.Printf("Check received : %s", bytes.NewBuffer(blob).String())
@@ -113,7 +109,7 @@ func (s *Subscriber) subscribe(funnel string) (chan []byte, chan bool) {
 	return msgChan, stopChan
 }
 
-func (s *Subscriber) forgeCheckResponse(payload map[string]interface{}, output *check.CheckOutput) map[string]interface{} {
+func (s *Subscriber) forgeCheckResponse(payload map[string]interface{}, output *stdCheck.CheckOutput) map[string]interface{} {
 	result := make(map[string]interface{})
 
 	result["client"] = s.Client.Config.Name()

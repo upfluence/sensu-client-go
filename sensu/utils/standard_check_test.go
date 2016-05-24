@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/upfluence/sensu-client-go/sensu/check"
+	"github.com/upfluence/sensu-go/sensu/check"
 )
 
 var (

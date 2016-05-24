@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/upfluence/sensu-go/sensu/transport"
 )
 
 const (
@@ -13,12 +15,11 @@ const (
 )
 
 type Client struct {
-	Transport Transport
+	Transport transport.Transport
 	Config    *Config
 }
 
-func NewClient(transport Transport, cfg *Config) *Client {
-
+func NewClient(transport transport.Transport, cfg *Config) *Client {
 	client := Client{
 		transport,
 		cfg,
@@ -28,14 +29,10 @@ func NewClient(transport Transport, cfg *Config) *Client {
 }
 
 func (c *Client) buildProcessors() []Processor {
-	processors := []Processor{NewKeepAlive()}
+	processors := []Processor{NewKeepAlive(c)}
 
 	for _, s := range c.Config.Subscriptions() {
-		processors = append(processors, NewSubscriber(s))
-	}
-
-	for _, processor := range processors {
-		processor.SetClient(c)
+		processors = append(processors, NewSubscriber(s, c))
 	}
 
 	return processors

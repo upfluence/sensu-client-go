@@ -1,9 +1,13 @@
 package check
 
-import "time"
+import (
+	"time"
+
+	stdCheck "github.com/upfluence/sensu-go/sensu/check"
+)
 
 type ExtensionCheckResult struct {
-	Status ExitStatus
+	Status stdCheck.ExitStatus
 	Output string
 }
 
@@ -11,15 +15,16 @@ type ExtensionCheck struct {
 	Function func() ExtensionCheckResult
 }
 
-func (c *ExtensionCheck) Execute() CheckOutput {
+func (c *ExtensionCheck) Execute() stdCheck.CheckOutput {
 	t0 := time.Now()
 
 	output := c.Function()
 
-	return CheckOutput{
+	return stdCheck.CheckOutput{
 		output.Status,
 		output.Output,
 		time.Now().Sub(t0).Seconds(),
 		t0.Unix(),
+		0,
 	}
 }

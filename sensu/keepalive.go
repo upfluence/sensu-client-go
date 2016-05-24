@@ -12,14 +12,8 @@ type KeepAlive struct {
 	closeChan chan bool
 }
 
-func NewKeepAlive() *KeepAlive {
-	return &KeepAlive{nil, make(chan bool)}
-}
-
-func (k *KeepAlive) SetClient(c *Client) error {
-	k.Client = c
-
-	return nil
+func NewKeepAlive(c *Client) *KeepAlive {
+	return &KeepAlive{c, make(chan bool)}
 }
 
 func (k *KeepAlive) PublishKeepAlive() {
@@ -37,16 +31,15 @@ func (k *KeepAlive) PublishKeepAlive() {
 
 	if err != nil {
 		log.Printf("something goes wrong : %s", err.Error())
+		return
 	}
 
-	log.Printf("Payload sent: %s", bytes.NewBuffer(p).String())
-
 	err = k.Client.Transport.Publish("direct", "keepalives", "", p)
+	log.Printf("Payload sent: %s", bytes.NewBuffer(p).String())
 
 	if err != nil {
 		log.Printf("something goes wrong : %s", err.Error())
 	}
-
 }
 
 func (k *KeepAlive) Start() error {

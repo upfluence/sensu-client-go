@@ -1,3 +1,9 @@
 package check
 
-var Store map[string]Check = make(map[string]Check)
+import stdCheck "github.com/upfluence/sensu-go/sensu/check"
+
+var Store = make(map[string]Check)
+
+type Check interface {
+	Execute() stdCheck.CheckOutput
+}

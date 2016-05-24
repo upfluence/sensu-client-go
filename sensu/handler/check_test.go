@@ -3,7 +3,7 @@ package handler
 import (
 	"testing"
 
-	"github.com/upfluence/sensu-client-go/sensu/check"
+	"github.com/upfluence/sensu-go/sensu/check"
 )
 
 func TestOk(t *testing.T) {

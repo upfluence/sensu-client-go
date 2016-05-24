@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/upfluence/sensu-client-go/sensu/check"
+	stdCheck "github.com/upfluence/sensu-go/sensu/check"
 )
 
 type Point struct {
@@ -32,5 +33,8 @@ func (m *Metric) Render() check.ExtensionCheckResult {
 		output = append(output, p.Render())
 	}
 
-	return check.ExtensionCheckResult{check.Success, strings.Join(output, "\n")}
+	return check.ExtensionCheckResult{
+		stdCheck.Success,
+		strings.Join(output, "\n"),
+	}
 }
