@@ -16,7 +16,7 @@ func NewKeepAlive(c *Client) *KeepAlive {
 	return &KeepAlive{c, make(chan bool)}
 }
 
-func (k *KeepAlive) PublishKeepAlive() {
+func (k *KeepAlive) publishKeepAlive() {
 	log.Println("Publishing keepalive")
 
 	payload := make(map[string]interface{})
@@ -45,12 +45,12 @@ func (k *KeepAlive) PublishKeepAlive() {
 func (k *KeepAlive) Start() error {
 	t := time.Tick(20 * time.Second)
 
-	k.PublishKeepAlive()
+	k.publishKeepAlive()
 
 	for {
 		select {
 		case <-t:
-			k.PublishKeepAlive()
+			k.publishKeepAlive()
 		case <-k.closeChan:
 			return nil
 		}
