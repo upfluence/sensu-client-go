@@ -62,7 +62,7 @@ func (s *Subscriber) handleMessage(blob []byte) {
 	var output stdCheck.CheckOutput
 	payload := make(map[string]interface{})
 
-	log.Printf("Check received : %s", bytes.NewBuffer(blob).String())
+	log.Printf("Check received: %s", bytes.NewBuffer(blob).String())
 	json.Unmarshal(blob, &payload)
 
 	if _, ok := payload["name"]; !ok {
@@ -82,7 +82,7 @@ func (s *Subscriber) handleMessage(blob []byte) {
 	p, err := json.Marshal(s.forgeCheckResponse(payload, &output))
 
 	if err != nil {
-		log.Printf("something goes wrong : %s", err.Error())
+		log.Printf("Something went wrong: %s", err.Error())
 	} else {
 		log.Printf("Payload sent: %s", bytes.NewBuffer(p).String())
 
