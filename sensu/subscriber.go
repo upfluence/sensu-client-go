@@ -3,11 +3,11 @@ package sensu
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/upfluence/goutils/log"
 	"github.com/upfluence/sensu-client-go/sensu/check"
 	stdCheck "github.com/upfluence/sensu-go/sensu/check"
 )
@@ -38,14 +38,14 @@ func (s *Subscriber) Start() error {
 	)
 
 	msgChan, stopChan := s.subscribe(funnel)
-	log.Printf("Subscribed to %s", s.Subscription)
+	log.Noticef("Subscribed to %s", s.Subscription)
 
 	for {
 		select {
 		case b := <-msgChan:
 			s.handleMessage(b)
 		case <-s.closeChan:
-			log.Printf("Gracefull stop of %s", s.Subscription)
+			log.Warningf("Gracefull stop of %s", s.Subscription)
 			stopChan <- true
 			return nil
 		}
@@ -62,18 +62,18 @@ func (s *Subscriber) handleMessage(blob []byte) {
 	var output stdCheck.CheckOutput
 	payload := make(map[string]interface{})
 
-	log.Printf("Check received: %s", bytes.NewBuffer(blob).String())
+	log.Noticef("Check received: %s", bytes.NewBuffer(blob).String())
 	json.Unmarshal(blob, &payload)
 
 	if _, ok := payload["name"]; !ok {
-		log.Printf("The name field is not filled")
+		log.Error("The name field is not filled")
 		return
 	}
 
 	if ch, ok := check.Store[payload["name"].(string)]; ok {
 		output = ch.Execute()
 	} else if _, ok := payload["command"]; !ok {
-		log.Printf("The command field is not filled")
+		log.Error("The command field is not filled")
 		return
 	} else {
 		output = (&check.ExternalCheck{payload["command"].(string)}).Execute()
@@ -82,9 +82,9 @@ func (s *Subscriber) handleMessage(blob []byte) {
 	p, err := json.Marshal(s.forgeCheckResponse(payload, &output))
 
 	if err != nil {
-		log.Printf("Something went wrong: %s", err.Error())
+		log.Errorf("Something went wrong: %s", err.Error())
 	} else {
-		log.Printf("Payload sent: %s", bytes.NewBuffer(p).String())
+		log.Noticef("Payload sent: %s", bytes.NewBuffer(p).String())
 
 		err = s.Client.Transport.Publish("direct", "results", "", p)
 	}

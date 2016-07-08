@@ -3,8 +3,9 @@ package sensu
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"time"
+
+	"github.com/upfluence/goutils/log"
 )
 
 type KeepAlive struct {
@@ -17,7 +18,7 @@ func NewKeepAlive(c *Client) *KeepAlive {
 }
 
 func (k *KeepAlive) publishKeepAlive() {
-	log.Println("Publishing keepalive")
+	log.Info("Publishing keepalive")
 
 	payload := make(map[string]interface{})
 
@@ -30,15 +31,15 @@ func (k *KeepAlive) publishKeepAlive() {
 	p, err := json.Marshal(payload)
 
 	if err != nil {
-		log.Printf("something goes wrong : %s", err.Error())
+		log.Warning("Something went wrong: %s", err.Error())
 		return
 	}
 
 	err = k.Client.Transport.Publish("direct", "keepalives", "", p)
-	log.Printf("Payload sent: %s", bytes.NewBuffer(p).String())
+	log.Info("Payload sent: %s", bytes.NewBuffer(p).String())
 
 	if err != nil {
-		log.Printf("something goes wrong : %s", err.Error())
+		log.Warning("Something went wrong: %s", err.Error())
 	}
 }
 

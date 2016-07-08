@@ -1,11 +1,11 @@
 package sensu
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/upfluence/goutils/log"
 	"github.com/upfluence/sensu-go/sensu/transport"
 )
 
@@ -61,7 +61,7 @@ func (c *Client) Start() error {
 
 		select {
 		case s := <-sig:
-			log.Printf("Signal %s received", s.String())
+			log.Noticef("Signal %s received", s.String())
 
 			for _, processor := range processors {
 				processor.Close()
@@ -69,7 +69,7 @@ func (c *Client) Start() error {
 
 			return c.Transport.Close()
 		case <-c.Transport.GetClosingChan():
-			log.Println("Transport disconnected")
+			log.Notice("Transport disconnected")
 
 			for _, processor := range processors {
 				processor.Close()
