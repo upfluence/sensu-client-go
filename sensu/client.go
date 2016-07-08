@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	CurrentVersion     string        = "0.1.2"
-	CONNECTION_TIMEOUT time.Duration = 5 * time.Second
+	CurrentVersion     = "1.0.0"
+	CONNECTION_TIMEOUT = 5 * time.Second
 )
 
 type Client struct {
