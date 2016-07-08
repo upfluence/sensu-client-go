@@ -2,7 +2,7 @@ package amqp_test
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/streadway/amqp"
 	"os"
 )
 

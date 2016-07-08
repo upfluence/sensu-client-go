@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/streadway/amqp"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/streadway/amqp"
 	"io"
 	"net"
 	"testing"

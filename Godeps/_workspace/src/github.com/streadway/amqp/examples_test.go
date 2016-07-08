@@ -3,7 +3,7 @@ package amqp_test
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"github.com/streadway/amqp"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/streadway/amqp"
 	"io/ioutil"
 	"log"
 	"net"
