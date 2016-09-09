@@ -53,13 +53,15 @@ this function pointer into an `check.ExtensionCheck` and add it into the
 package main
 
 ```golang
+package main
+
 import (
 	"net/http"
 
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 	"github.com/upfluence/sensu-client-go/sensu"
 	"github.com/upfluence/sensu-client-go/sensu/check"
 	"github.com/upfluence/sensu-client-go/sensu/handler"
-	"github.com/upfluence/sensu-client-go/sensu/transport"
 )
 
 func HTTPCheck() check.ExtensionCheckResult {
@@ -81,7 +83,7 @@ func HTTPCheck() check.ExtensionCheckResult {
 func main() {
 	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
 
-	t := transport.NewRabbitMQTransport(cfg)
+	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
 	client := sensu.NewClient(t, cfg)
 
 	check.Store["http_check"] = &check.ExtensionCheck{HTTPCheck}
@@ -104,15 +106,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 	"github.com/upfluence/sensu-client-go/sensu"
 	"github.com/upfluence/sensu-client-go/sensu/check"
-	"github.com/upfluence/sensu-client-go/sensu/transport"
 	"github.com/upfluence/sensu-client-go/sensu/utils"
 )
 
-func HTTPCallDuration() (float64, err) {
+func HTTPCallDuration() (float64, error) {
 	t0 := time.Now().Unix()
-	resp, err := http.Get("http://example.com/")
+	_, err := http.Get("http://example.com/")
 
 	return float64(time.Now().Unix() - t0), err
 }
@@ -126,12 +128,12 @@ func main() {
 		CheckMessage: func(v float64) string {
 			return fmt.Sprintf("Duration: %.2fs", v)
 		},
-    Comp:             func(x,y float64) bool { return x > y }
+		Comp: func(x, y float64) bool { return x > y },
 	}
 
 	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
 
-	t := transport.NewRabbitMQTransport(cfg)
+	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
 	client := sensu.NewClient(t, cfg)
 
 	check.Store["http_duration_check"] = &check.ExtensionCheck{c.Check}
