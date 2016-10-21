@@ -31,15 +31,15 @@ func (k *KeepAlive) publishKeepAlive() {
 	p, err := json.Marshal(payload)
 
 	if err != nil {
-		log.Warning("Something went wrong: %s", err.Error())
+		log.Warningf("Something went wrong: %s", err.Error())
 		return
 	}
 
 	err = k.Client.Transport.Publish("direct", "keepalives", "", p)
-	log.Info("Payload sent: %s", bytes.NewBuffer(p).String())
+	log.Infof("Payload sent: %s", bytes.NewBuffer(p).String())
 
 	if err != nil {
-		log.Warning("Something went wrong: %s", err.Error())
+		log.Warningf("Something went wrong: %s", err.Error())
 	}
 }
 
