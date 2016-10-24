@@ -20,11 +20,11 @@
 		},
 		{
 			"ImportPath": "github.com/upfluence/sensu-go/sensu/check",
-			"Rev": "f7c1609be903c257b48590ecff5ba4646255c549"
+			"Rev": "b2c8792ecdaadc2615d2f01e4bc1749bce65decb"
 		},
 		{
 			"ImportPath": "github.com/upfluence/sensu-go/sensu/transport",
-			"Rev": "f7c1609be903c257b48590ecff5ba4646255c549"
+			"Rev": "b2c8792ecdaadc2615d2f01e4bc1749bce65decb"
 		}
 	]
 }

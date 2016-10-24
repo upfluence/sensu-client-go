@@ -41,7 +41,14 @@ func (t *RabbitMQTransport) Connect() error {
 
 	log.Noticef("RabbitMQ connection and channel opened to %s", t.URI)
 
-	t.ClosingChannel = make(chan bool)
+	closeChan := make(chan *amqp.Error)
+	t.Channel.NotifyClose(closeChan)
+
+	go func() {
+		<-closeChan
+		t.ClosingChannel <- true
+	}()
+
 	return nil
 }
 
