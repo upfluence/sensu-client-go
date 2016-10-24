@@ -2,16 +2,18 @@ package check
 
 import (
 	"testing"
+
+	stdCheck "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 )
 
 func FunctionT() ExtensionCheckResult {
-	return ExtensionCheckResult{Warning, "foo"}
+	return ExtensionCheckResult{stdCheck.Warning, "foo"}
 }
 
 func TestExtension(t *testing.T) {
 	r := (&ExtensionCheck{FunctionT}).Execute()
 
-	if r.Status != Warning {
+	if r.Status != stdCheck.Warning {
 		t.Errorf("Wrong status: %d", r.Status)
 	}
 

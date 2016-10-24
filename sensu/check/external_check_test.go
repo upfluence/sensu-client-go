@@ -2,12 +2,14 @@ package check
 
 import (
 	"testing"
+
+	stdCheck "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 )
 
 func TestEmptyCommand(t *testing.T) {
 	r := (&ExternalCheck{}).Execute()
 
-	if r.Status != Error {
+	if r.Status != stdCheck.Error {
 		t.Errorf("The status is not failed, %d", r.Status)
 	}
 
@@ -19,7 +21,7 @@ func TestEmptyCommand(t *testing.T) {
 func TestCorrectCommand(t *testing.T) {
 	r := (&ExternalCheck{"ls"}).Execute()
 
-	if r.Status != Success {
+	if r.Status != stdCheck.Success {
 		t.Errorf("The status is not success, %d", r.Status)
 	}
 
@@ -31,7 +33,7 @@ func TestCorrectCommand(t *testing.T) {
 func TestOtherExitCodeCommand(t *testing.T) {
 	r := (&ExternalCheck{"lsi /fiz/fux"}).Execute()
 
-	if r.Status != Error {
+	if r.Status != stdCheck.Error {
 		t.Errorf("The status is not success, %d", r.Status)
 	}
 
