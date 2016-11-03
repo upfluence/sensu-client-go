@@ -3,7 +3,6 @@ package check
 import (
 	"bytes"
 	"os/exec"
-	"strings"
 	"syscall"
 	"time"
 
@@ -15,10 +14,8 @@ type ExternalCheck struct {
 }
 
 func (c *ExternalCheck) Execute() stdCheck.CheckOutput {
-	command := strings.Split(c.Command, " ")
-
 	t0 := time.Now()
-	cmd := exec.Command(command[0], command[1:]...)
+	cmd := exec.Command("/bin/sh", "-c", c.Command)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
@@ -38,7 +35,7 @@ func (c *ExternalCheck) Execute() stdCheck.CheckOutput {
 		status = stdCheck.Error
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			if statusReturn, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				status = stdCheck.ExitStatus(statusReturn)
+				status = stdCheck.ExitStatus(statusReturn.ExitStatus())
 			}
 		}
 	}

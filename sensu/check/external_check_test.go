@@ -9,7 +9,7 @@ import (
 func TestEmptyCommand(t *testing.T) {
 	r := (&ExternalCheck{}).Execute()
 
-	if r.Status != stdCheck.Error {
+	if r.Status != stdCheck.Success {
 		t.Errorf("The status is not failed, %d", r.Status)
 	}
 
@@ -33,11 +33,23 @@ func TestCorrectCommand(t *testing.T) {
 func TestOtherExitCodeCommand(t *testing.T) {
 	r := (&ExternalCheck{"lsi /fiz/fux"}).Execute()
 
-	if r.Status != stdCheck.Error {
+	if r.Status != 127 {
 		t.Errorf("The status is not success, %d", r.Status)
 	}
 
 	if r.Duration <= 0.0 {
 		t.Errorf("The duration is not positive: %f", r.Duration)
+	}
+}
+
+func TestCustomeExitCodeCommand(t *testing.T) {
+	r := (&ExternalCheck{`/bin/bash -c "echo 'foo'; exit 42"`}).Execute()
+
+	if r.Status != 42 {
+		t.Errorf("The status is not success, %d", r.Status)
+	}
+
+	if r.Output != "foo\n" {
+		t.Errorf("Wrong output: %v", r.Output)
 	}
 }
