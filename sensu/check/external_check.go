@@ -10,22 +10,22 @@ import (
 )
 
 type ExternalCheck struct {
-	Command string
+	Request *stdCheck.CheckRequest
 }
 
 func (c *ExternalCheck) Execute() stdCheck.CheckOutput {
 	t0 := time.Now()
-	cmd := exec.Command("/bin/sh", "-c", c.Command)
+	cmd := exec.Command("/bin/sh", "-c", c.Request.Command)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
 	if err := cmd.Start(); err != nil {
 		return stdCheck.CheckOutput{
-			stdCheck.Error,
-			err.Error(),
-			time.Now().Sub(t0).Seconds(),
-			t0.Unix(),
-			0,
+			CheckRequest: c.Request,
+			Status:       stdCheck.Error,
+			Output:       err.Error(),
+			Duration:     time.Since(t0).Seconds(),
+			Executed:     t0.Unix(),
 		}
 	}
 
@@ -41,10 +41,9 @@ func (c *ExternalCheck) Execute() stdCheck.CheckOutput {
 	}
 
 	return stdCheck.CheckOutput{
-		status,
-		out.String(),
-		time.Now().Sub(t0).Seconds(),
-		t0.Unix(),
-		0,
+		Status:   status,
+		Output:   out.String(),
+		Duration: time.Since(t0).Seconds(),
+		Executed: t0.Unix(),
 	}
 }

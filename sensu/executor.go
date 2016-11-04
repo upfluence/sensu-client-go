@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	stdCheck "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 	"github.com/upfluence/sensu-client-go/sensu/check"
 )
 
@@ -12,7 +13,7 @@ type CheckResponse struct {
 	Client string               `json:"client"`
 }
 
-func executeCheck(input *stdCheck.CheckRequest) (*stdCheck.CheckOutput, error) {
+func executeCheck(input *stdCheck.CheckRequest, client *client.Client) (*stdCheck.CheckOutput, error) {
 	var output stdCheck.CheckOutput
 
 	if ch, ok := check.Store[input.Extension]; input.Extension != "" && ok {
@@ -24,6 +25,8 @@ func executeCheck(input *stdCheck.CheckRequest) (*stdCheck.CheckOutput, error) {
 	} else {
 		output = (&check.ExternalCheck{Request: input}).Execute()
 	}
+
+	output.CheckRequest = input
 
 	return &output, nil
 }

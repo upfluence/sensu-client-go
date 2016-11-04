@@ -21,10 +21,9 @@ func (c *ExtensionCheck) Execute() stdCheck.CheckOutput {
 	output := c.Function()
 
 	return stdCheck.CheckOutput{
-		output.Status,
-		output.Output,
-		time.Now().Sub(t0).Seconds(),
-		t0.Unix(),
-		0,
+		Status:   output.Status,
+		Output:   output.Output,
+		Duration: time.Since(t0).Seconds(),
+		Executed: t0.Unix(),
 	}
 }
