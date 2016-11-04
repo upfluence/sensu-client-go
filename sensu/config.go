@@ -5,91 +5,73 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
 
-const DefaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2f"
+const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2f"
 
-type ConfigFlagSet struct {
-	ConfigFile string
-	Verbose    bool
+type configFlagSet struct {
+	configFile string
+	verbose    bool
 }
 
 type Config struct {
-	FlagSet *ConfigFlagSet
-	config  map[string]interface{}
+	flagSet *configFlagSet
+	config  *configPayload
 }
 
-func NewConfigFromFlagSet(flagset *ConfigFlagSet) *Config {
-	cfg := Config{
-		flagset,
-		make(map[string]interface{}),
-	}
+type configPayload struct {
+	Client      *client.Client `json:"client,omitempty"`
+	Checks      []*check.Check `json:"checks,omitempty"`
+	RabbitMQURI *string        `json:"rabbitmq_uri,omitempty"`
+}
 
-	if flagset != nil && flagset.ConfigFile != "" {
-		buf, err := ioutil.ReadFile(flagset.ConfigFile)
+func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
+	var cfg = Config{flagset, &configPayload{}}
 
-		if err != nil {
-			panic(err)
-		}
-
-		err = json.Unmarshal(buf, &cfg.config)
+	if flagset != nil && flagset.configFile != "" {
+		buf, err := ioutil.ReadFile(flagset.configFile)
 
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
-		cfg.config = cfg.config["client"].(map[string]interface{})
+		if err := json.Unmarshal(buf, &cfg.config); err != nil {
+			return nil, err
+		}
 	}
 
-	return &cfg
+	return &cfg, nil
 }
 
 func (c *Config) RabbitMQURI() string {
-	uri := os.Getenv("RABBITMQ_URL")
-
-	if uri == "" && c.config["rabbit_uri"] != nil {
-		uri = c.config["rabbit_uri"].(string)
-	} else if uri == "" {
-		uri = DefaultRabbitMQURI
+	if cfg := c.config; cfg != nil && cfg.RabbitMQURI != nil {
+		return *cfg.RabbitMQURI
+	} else if uri := os.Getenv("RABBITMQ_URL"); uri != "" {
+		return uri
 	}
 
-	return uri
+	return defaultRabbitMQURI
 }
 
-func (c *Config) Name() string {
-	name := os.Getenv("SENSU_CLIENT_NAME")
-
-	if name == "" && c.config["name"] != nil {
-		name = c.config["name"].(string)
+func (c *Config) Client() *client.Client {
+	if cfg := c.config; cfg != nil && cfg.Client != nil {
+		return cfg.Client
 	}
 
-	return name
+	return &client.Client{
+		Name:          os.Getenv("SENSU_CLIENT_NAME"),
+		Address:       os.Getenv("SENSU_ADDRESS"),
+		Subscriptions: strings.Split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
+	}
 }
 
-func (c *Config) Address() string {
-	address := os.Getenv("SENSU_ADDRESS")
-
-	if address == "" && c.config["address"] != nil {
-		address = c.config["address"].(string)
+func (c *Config) Checks() []*check.Check {
+	if cfg := c.config; cfg != nil {
+		return cfg.Checks
 	}
 
-	return address
-}
-
-func (c *Config) Subscriptions() []string {
-	subscriptions := []string{}
-
-	for _, s := range strings.Split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ",") {
-		if s != "" {
-			subscriptions = append(subscriptions, s)
-		}
-	}
-
-	if len(subscriptions) == 0 && c.config["subscriptions"] != nil {
-		for _, s := range c.config["subscriptions"].([]interface{}) {
-			subscriptions = append(subscriptions, s.(string))
-		}
-	}
-
-	return subscriptions
+	return []*check.Check{}
 }
