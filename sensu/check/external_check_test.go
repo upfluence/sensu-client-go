@@ -7,7 +7,9 @@ import (
 )
 
 func TestEmptyCommand(t *testing.T) {
-	r := (&ExternalCheck{}).Execute()
+	r := (&ExternalCheck{
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{}},
+	}).Execute()
 
 	if r.Status != stdCheck.Success {
 		t.Errorf("The status is not failed, %d", r.Status)
@@ -19,7 +21,9 @@ func TestEmptyCommand(t *testing.T) {
 }
 
 func TestCorrectCommand(t *testing.T) {
-	r := (&ExternalCheck{"ls"}).Execute()
+	r := (&ExternalCheck{
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{Command: "ls"}},
+	}).Execute()
 
 	if r.Status != stdCheck.Success {
 		t.Errorf("The status is not success, %d", r.Status)
@@ -31,7 +35,9 @@ func TestCorrectCommand(t *testing.T) {
 }
 
 func TestOtherExitCodeCommand(t *testing.T) {
-	r := (&ExternalCheck{"lsi /fiz/fux"}).Execute()
+	r := (&ExternalCheck{
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{Command: "lsi /fiz/fux"}},
+	}).Execute()
 
 	if r.Status != 127 {
 		t.Errorf("The status is not success, %d", r.Status)
@@ -43,7 +49,11 @@ func TestOtherExitCodeCommand(t *testing.T) {
 }
 
 func TestCustomeExitCodeCommand(t *testing.T) {
-	r := (&ExternalCheck{`/bin/bash -c "echo 'foo'; exit 42"`}).Execute()
+	r := (&ExternalCheck{
+		&stdCheck.CheckRequest{
+			Check: &stdCheck.Check{Command: `/bin/bash -c "echo 'foo'; exit 42"`},
+		},
+	}).Execute()
 
 	if r.Status != 42 {
 		t.Errorf("The status is not success, %d", r.Status)
