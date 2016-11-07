@@ -20,7 +20,7 @@ func executeCheck(input *stdCheck.CheckRequest) (*stdCheck.CheckOutput, error) {
 	} else if ch, ok := check.Store[input.Name]; ok {
 		output = ch.Execute()
 	} else if input.Command == "" {
-		return nil, errors.New("Command key not fileed")
+		return nil, errors.New("Command key not filled")
 	} else {
 		output = (&check.ExternalCheck{Request: input}).Execute()
 	}
