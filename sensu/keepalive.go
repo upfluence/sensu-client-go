@@ -6,11 +6,20 @@ import (
 	"time"
 
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/log"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
+
+const defaultInterval = 20 * time.Second
 
 type KeepAlive struct {
 	Client    *Client
 	closeChan chan bool
+}
+
+type keepAlivePayload struct {
+	*client.Client
+	Timestamp int64  `json:"timestamp"`
+	Version   string `json:"version"`
 }
 
 func NewKeepAlive(c *Client) *KeepAlive {
@@ -20,15 +29,13 @@ func NewKeepAlive(c *Client) *KeepAlive {
 func (k *KeepAlive) publishKeepAlive() {
 	log.Info("Publishing keepalive")
 
-	payload := make(map[string]interface{})
-
-	payload["timestamp"] = time.Now().Unix()
-	payload["version"] = CurrentVersion
-	payload["name"] = k.Client.Config.Name()
-	payload["address"] = k.Client.Config.Address()
-	payload["subscriptions"] = k.Client.Config.Subscriptions()
-
-	p, err := json.Marshal(payload)
+	p, err := json.Marshal(
+		keepAlivePayload{
+			k.Client.Config.Client(),
+			time.Now().Unix(),
+			currentVersion,
+		},
+	)
 
 	if err != nil {
 		log.Warningf("Something went wrong: %s", err.Error())
@@ -44,7 +51,7 @@ func (k *KeepAlive) publishKeepAlive() {
 }
 
 func (k *KeepAlive) Start() error {
-	t := time.Tick(20 * time.Second)
+	t := time.Tick(defaultInterval)
 
 	k.publishKeepAlive()
 
@@ -56,8 +63,6 @@ func (k *KeepAlive) Start() error {
 			return nil
 		}
 	}
-
-	return nil
 }
 
 func (k *KeepAlive) Close() {

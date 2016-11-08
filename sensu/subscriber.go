@@ -8,18 +8,17 @@ import (
 	"time"
 
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/log"
-	stdCheck "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
-	"github.com/upfluence/sensu-client-go/sensu/check"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 )
 
 const (
-	MAX_FAILS = 100
-	MAX_TIME  = 60 * time.Second
+	maxFail = 100
+	maxTime = 60 * time.Second
 )
 
 type Subscriber struct {
-	Subscription string
-	Client       *Client
+	subscription string
+	client       *Client
 	closeChan    chan bool
 }
 
@@ -30,28 +29,26 @@ func NewSubscriber(subscription string, c *Client) *Subscriber {
 func (s *Subscriber) Start() error {
 	funnel := strings.Join(
 		[]string{
-			s.Client.Config.Name(),
-			CurrentVersion,
+			s.client.Config.Client().Name,
+			currentVersion,
 			strconv.Itoa(int(time.Now().Unix())),
 		},
 		"-",
 	)
 
 	msgChan, stopChan := s.subscribe(funnel)
-	log.Noticef("Subscribed to %s", s.Subscription)
+	log.Noticef("Subscribed to %s", s.subscription)
 
 	for {
 		select {
 		case b := <-msgChan:
 			s.handleMessage(b)
 		case <-s.closeChan:
-			log.Warningf("Gracefull stop of %s", s.Subscription)
+			log.Warningf("Gracefull stop of %s", s.subscription)
 			stopChan <- true
 			return nil
 		}
 	}
-
-	return nil
 }
 
 func (s *Subscriber) Close() {
@@ -59,34 +56,31 @@ func (s *Subscriber) Close() {
 }
 
 func (s *Subscriber) handleMessage(blob []byte) {
-	var output stdCheck.CheckOutput
-	payload := make(map[string]interface{})
+	var input check.CheckRequest
 
 	log.Noticef("Check received: %s", bytes.NewBuffer(blob).String())
-	json.Unmarshal(blob, &payload)
 
-	if _, ok := payload["name"]; !ok {
-		log.Error("The name field is not filled")
+	if err := json.Unmarshal(blob, &input); err != nil {
+		log.Errorf("Something went wrong: %s", err.Error())
 		return
 	}
 
-	if ch, ok := check.Store[payload["name"].(string)]; ok {
-		output = ch.Execute()
-	} else if _, ok := payload["command"]; !ok {
-		log.Error("The command field is not filled")
+	output, err := executeCheck(&input)
+
+	if err != nil {
+		log.Error(err.Error())
 		return
-	} else {
-		output = (&check.ExternalCheck{payload["command"].(string)}).Execute()
 	}
 
-	p, err := json.Marshal(s.forgeCheckResponse(payload, &output))
+	p, err := json.Marshal(
+		&CheckResponse{Check: *output, Client: s.client.Config.Client().Name},
+	)
 
 	if err != nil {
 		log.Errorf("Something went wrong: %s", err.Error())
 	} else {
 		log.Noticef("Payload sent: %s", bytes.NewBuffer(p).String())
-
-		err = s.Client.Transport.Publish("direct", "results", "", p)
+		s.client.Transport.Publish("direct", "results", "", p)
 	}
 }
 
@@ -96,9 +90,9 @@ func (s *Subscriber) subscribe(funnel string) (chan []byte, chan bool) {
 
 	go func() {
 		for {
-			s.Client.Transport.Subscribe(
+			s.client.Transport.Subscribe(
 				"#",
-				s.Subscription,
+				s.subscription,
 				funnel,
 				msgChan,
 				stopChan,
@@ -107,23 +101,4 @@ func (s *Subscriber) subscribe(funnel string) (chan []byte, chan bool) {
 	}()
 
 	return msgChan, stopChan
-}
-
-func (s *Subscriber) forgeCheckResponse(payload map[string]interface{}, output *stdCheck.CheckOutput) map[string]interface{} {
-	result := make(map[string]interface{})
-
-	result["client"] = s.Client.Config.Name()
-
-	formattedOuput := make(map[string]interface{})
-
-	formattedOuput["name"] = payload["name"]
-	formattedOuput["issued"] = int(payload["issued"].(float64))
-	formattedOuput["output"] = output.Output
-	formattedOuput["duration"] = output.Duration
-	formattedOuput["status"] = output.Status
-	formattedOuput["executed"] = output.Executed
-
-	result["check"] = formattedOuput
-
-	return result
 }

@@ -1,0 +1,14 @@
+{
+  "client": {
+    "name": "fiz",
+    "address": "192.168.1.1"
+  },
+  "checks": [
+    {
+      "name": "check-1",
+      "standalone": true,
+      "interval": 5,
+      "command": "ls ."
+    }
+  ]
+}

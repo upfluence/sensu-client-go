@@ -5,12 +5,12 @@ import (
 	"os"
 )
 
-func ExtractFlags() *ConfigFlagSet {
-	flagset := flag.NewFlagSet("etcdenv", flag.ExitOnError)
-	flags := &ConfigFlagSet{}
+func ExtractFlags() *configFlagSet {
+	flagset := flag.NewFlagSet("sensu-client-go", flag.ExitOnError)
+	flags := &configFlagSet{}
 
-	flagset.BoolVar(&flags.Verbose, "v", false, "Verbose mode")
-	flagset.StringVar(&flags.ConfigFile, "c", "", "Config file path")
+	flagset.BoolVar(&flags.verbose, "v", false, "Verbose mode")
+	flagset.StringVar(&flags.configFile, "c", "", "Config file path")
 
 	flagset.Parse(os.Args[1:])
 

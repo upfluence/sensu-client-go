@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	CurrentVersion     = "1.0.0"
-	CONNECTION_TIMEOUT = 5 * time.Second
+	currentVersion    = "1.0.0"
+	connectionTimeout = 5 * time.Second
 )
 
 type Client struct {
@@ -31,8 +31,14 @@ func NewClient(transport transport.Transport, cfg *Config) *Client {
 func (c *Client) buildProcessors() []Processor {
 	processors := []Processor{NewKeepAlive(c)}
 
-	for _, s := range c.Config.Subscriptions() {
+	for _, s := range c.Config.Client().Subscriptions {
 		processors = append(processors, NewSubscriber(s, c))
+	}
+
+	for _, check := range c.Config.Checks() {
+		if check.Standalone {
+			processors = append(processors, NewStandalone(check, c))
+		}
 	}
 
 	return processors
@@ -47,7 +53,7 @@ func (c *Client) Start() error {
 
 		for !c.Transport.IsConnected() {
 			select {
-			case <-time.After(CONNECTION_TIMEOUT):
+			case <-time.After(connectionTimeout):
 				c.Transport.Connect()
 			case <-sig:
 				return c.Transport.Close()

@@ -1,17 +1,21 @@
 package check
 
-type ExitStatus uint8
+type CheckType string
 
 const (
-	Success ExitStatus = iota
-	Warning
-	Error
+	Metric   CheckType = "metric"
+	Standard CheckType = "standard"
 )
 
-type CheckOutput struct {
-	Status   ExitStatus `json:"status"`
-	Output   string     `json:"output"`
-	Duration float64    `json:"duration,omitempty"`
-	Executed int64      `json:"executed,omitempty"`
-	Issued   int64      `json:"issued,omitempty"`
+type Check struct {
+	Name        string    `json:"name,omitempty"`
+	Type        CheckType `json:"type,omitempty"`
+	Command     string    `json:"command,omitempty"`
+	Extension   string    `json:"extension,omitempty"`
+	Standalone  bool      `json:"standalone,omitempty"`
+	Subscribers []string  `json:"subscribers,omitempty"`
+	Handler     string    `json:"handler,omitempty"`
+	Handlers    []string  `json:"handlers,omitempty"`
+	Source      string    `json:"source,omitempty"`
+	Interval    int64     `json:"interval,omitempty"`
 }

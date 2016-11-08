@@ -58,6 +58,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/log"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 	"github.com/upfluence/sensu-client-go/sensu"
 	"github.com/upfluence/sensu-client-go/sensu/check"
@@ -81,7 +82,11 @@ func HTTPCheck() check.ExtensionCheckResult {
 }
 
 func main() {
-	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
+	cfg, err := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
 	client := sensu.NewClient(t, cfg)
@@ -106,6 +111,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/log"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 	"github.com/upfluence/sensu-client-go/sensu"
 	"github.com/upfluence/sensu-client-go/sensu/check"
@@ -131,7 +137,11 @@ func main() {
 		Comp: func(x, y float64) bool { return x > y },
 	}
 
-	cfg := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
+	cfg, err := sensu.NewConfigFromFlagSet(sensu.ExtractFlags())
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
 	client := sensu.NewClient(t, cfg)
@@ -190,4 +200,3 @@ variables:
 
 * [ ] Implement the keep-alives specific configurations (thresholds and
   hanlder)
-* [ ] Implement the standalone check mechanism
