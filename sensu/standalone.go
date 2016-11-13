@@ -33,7 +33,7 @@ func (s *Standalone) Start() error {
 		case <-t:
 			s.execute()
 		case <-s.closeChan:
-			log.Warningf("Gracefull stop of %s", s.check.Name)
+			log.Warningf("Graceful stop of %s", s.check.Name)
 			return nil
 		}
 	}
