@@ -63,7 +63,7 @@ func (c *Config) Client() *client.Client {
 
 	return &client.Client{
 		Name:          os.Getenv("SENSU_CLIENT_NAME"),
-		Address:       os.Getenv("SENSU_ADDRESS"),
+		Address:       os.Getenv("SENSU_CLIENT_ADDRESS"),
 		Subscriptions: strings.Split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
 	}
 }
