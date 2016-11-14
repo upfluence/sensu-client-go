@@ -182,7 +182,7 @@ In the both cases, you can use the  `-c` flag to use a specific
 configuration file, the configuration is pretty similar to the ruby
 client [check out the doc](https://sensuapp.org/docs/0.26/reference/clients.html). The
 difference is about the configuration of the RabbitMQ client. You have
-to provide an RabbitMQ URI through the `RABBITMQ_URL` environment
+to provide an RabbitMQ URI through the `RABBITMQ_URI` environment
 variable or by adding the `rabbit_uri` key into the root of the JSON
 configuration file.
 
@@ -194,7 +194,7 @@ variables:
 | SENSU_CLIENT_SUBSCRIPTIONS | Comma separated subscriptions | email,slack |
 | SENSU_CLIENT_NAME | The name of the client | node-01 |
 | SENSU_CLIENT_ADDRESS | The ip addres of the client | 127.0.0.1 |
-| RABBITMQ_URL | RabbitMQ url | amqp://guest:guest@localhost:5672/%2f |
+| RABBITMQ_URI | RabbitMQ URI | amqp://guest:guest@localhost:5672/%2f |
 
 ## Roadmap
 

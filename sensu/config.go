@@ -49,7 +49,7 @@ func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 func (c *Config) RabbitMQURI() string {
 	if cfg := c.config; cfg != nil && cfg.RabbitMQURI != nil {
 		return *cfg.RabbitMQURI
-	} else if uri := os.Getenv("RABBITMQ_URL"); uri != "" {
+	} else if uri := os.Getenv("RABBITMQ_URI"); uri != "" {
 		return uri
 	}
 
