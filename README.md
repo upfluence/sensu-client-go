@@ -180,7 +180,7 @@ $ ./sensu-client -c sensu-config.json
 
 In the both cases, you can use the  `-c` flag to use a specific
 configuration file, the configuration is pretty similar to the ruby
-client [check out the doc](http://sensuapp.org/docs/0.16/clients). The
+client [check out the doc](https://sensuapp.org/docs/0.26/reference/clients.html). The
 difference is about the configuration of the RabbitMQ client. You have
 to provide an RabbitMQ URI through the `RABBITMQ_URL` environment
 variable or by adding the `rabbit_uri` key into the root of the JSON
