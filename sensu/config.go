@@ -28,6 +28,16 @@ type configPayload struct {
 	RabbitMQURI *string        `json:"rabbitmq_uri,omitempty"`
 }
 
+func fetchEnv(envs ...string) string {
+	for _, env := range envs {
+		if v := os.Getenv(env); v != "" {
+			return v
+		}
+	}
+
+	return ""
+}
+
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 	var cfg = Config{flagset, &configPayload{}}
 
@@ -49,7 +59,7 @@ func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 func (c *Config) RabbitMQURI() string {
 	if cfg := c.config; cfg != nil && cfg.RabbitMQURI != nil {
 		return *cfg.RabbitMQURI
-	} else if uri := os.Getenv("RABBITMQ_URI"); uri != "" {
+	} else if uri := fetchEnv("RABBITMQ_URI", "RABBITMQ_URL"); uri != "" {
 		return uri
 	}
 
@@ -63,7 +73,7 @@ func (c *Config) Client() *client.Client {
 
 	return &client.Client{
 		Name:          os.Getenv("SENSU_CLIENT_NAME"),
-		Address:       os.Getenv("SENSU_CLIENT_ADDRESS"),
+		Address:       fetchEnv("SENSU_CLIENT_ADDRESS", "SENSU_ADDRESS"),
 		Subscriptions: strings.Split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
 	}
 }
