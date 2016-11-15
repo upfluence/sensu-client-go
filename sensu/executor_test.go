@@ -8,7 +8,11 @@ import (
 	"github.com/upfluence/sensu-client-go/sensu/handler"
 )
 
-func validateCheckOutput(checkRequest *stdCheck.CheckRequest, expectedOutput *stdCheck.CheckOutput, t *testing.T) {
+func validateCheckOutput(
+	checkRequest *stdCheck.CheckRequest,
+	expectedOutput *stdCheck.CheckOutput,
+	t *testing.T) {
+
 	output, err := executeCheck(checkRequest)
 
 	if err != nil {
@@ -20,43 +24,59 @@ func validateCheckOutput(checkRequest *stdCheck.CheckRequest, expectedOutput *st
 	}
 
 	if output.Status != expectedOutput.Status {
-		t.Errorf("Expected status to be \"%d\" but got \"%d\" instead!", expectedOutput.Status, output.Status)
+		t.Errorf("Expected status to be \"%d\" but got \"%d\" instead!",
+			expectedOutput.Status,
+			output.Status)
 	}
 
 	if output.Output != expectedOutput.Output {
-		t.Errorf("Expected output to be \"%d\" but got \"%d\" instead!", expectedOutput.Output, output.Output)
+		t.Errorf("Expected output to be \"%d\" but got \"%d\" instead!",
+			expectedOutput.Output,
+			output.Output)
 	}
 }
 
 func TestExecuteExtensionCheck(t *testing.T) {
-	check.Store["extension_check"] = &check.ExtensionCheck{Function: func() check.ExtensionCheckResult {
-		return handler.Ok("Test")
-	}}
+	check.Store["extension_check"] = &check.ExtensionCheck{
+		Function: func() check.ExtensionCheckResult {
 
-	validateCheckOutput(&stdCheck.CheckRequest{Check: &stdCheck.Check{Extension: "extension_check"}},
-		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"}, t)
+			return handler.Ok("Test")
+		}}
+
+	validateCheckOutput(
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{Extension: "extension_check"}},
+		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"},
+		t)
 }
 
 func TestExecuteNamedExtensionCheck(t *testing.T) {
-	check.Store["named_extension_check"] = &check.ExtensionCheck{Function: func() check.ExtensionCheckResult {
-		return handler.Ok("Test")
-	}}
+	check.Store["named_extension_check"] = &check.ExtensionCheck{
+		Function: func() check.ExtensionCheckResult {
+			return handler.Ok("Test")
+		}}
 
-	validateCheckOutput(&stdCheck.CheckRequest{Check: &stdCheck.Check{Name: "named_extension_check"}},
-		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"}, t)
+	validateCheckOutput(
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{Name: "named_extension_check"}},
+		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"},
+		t)
 }
 
 func TestExecuteExternalCheck(t *testing.T) {
-	validateCheckOutput(&stdCheck.CheckRequest{Check: &stdCheck.Check{Command: "printf Test"}},
-		&stdCheck.CheckOutput{Status: 0, Output: "Test"}, t)
+	validateCheckOutput(
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{Command: "printf Test"}},
+		&stdCheck.CheckOutput{Status: 0, Output: "Test"},
+		t)
 }
 
 func TestExecuteEmptyCheck(t *testing.T) {
 
-	output, err := executeCheck(&stdCheck.CheckRequest{Check: &stdCheck.Check{}, Issued: 1479057736})
+	output, err := executeCheck(
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{}, Issued: 1479057736})
 
 	if err != commandKeyError {
-		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!", commandKeyError, err)
+		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
+			commandKeyError,
+			err)
 	}
 
 	if output != nil {

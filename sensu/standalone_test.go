@@ -13,7 +13,9 @@ func TestMissingCommandKey(t *testing.T) {
 	err := standaloneProcessor.execute()
 
 	if err != commandKeyError {
-		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!", commandKeyError, err)
+		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
+			commandKeyError,
+			err)
 	}
 }
 
@@ -38,12 +40,27 @@ func (t *dummyTransport) Close() error {
 	return nil
 }
 
-func (t *dummyTransport) Publish(exchangeType, exchangeName, key string, message []byte) error {
-	t.publishParameters = &transportPublishParameters{exchangeType, exchangeName, key, message}
+func (t *dummyTransport) Publish(
+	exchangeType,
+	exchangeName,
+	key string,
+	message []byte) error {
+
+	t.publishParameters = &transportPublishParameters{
+		exchangeType,
+		exchangeName,
+		key,
+		message}
 	return nil
 }
 
-func (t *dummyTransport) Subscribe(key, exchangeName, queueName string, messageChan chan []byte, stopChan chan bool) error {
+func (t *dummyTransport) Subscribe(
+	key,
+	exchangeName,
+	queueName string,
+	messageChan chan []byte,
+	stopChan chan bool) error {
+
 	return nil
 }
 
@@ -52,8 +69,12 @@ func (t *dummyTransport) GetClosingChan() chan bool {
 }
 
 func TestRunCommand(t *testing.T) {
-	standaloneProcessor := NewStandalone(&stdCheck.Check{Command: "ls"},
-		&Client{Config: &Config{config: &configPayload{Client: &stdClient.Client{Name: "Test"}}},
+	standaloneProcessor := NewStandalone(
+		&stdCheck.Check{Command: "ls"},
+		&Client{
+			Config: &Config{
+				config: &configPayload{
+					Client: &stdClient.Client{Name: "Test"}}},
 			Transport: &dummyTransport{}})
 
 	err := standaloneProcessor.execute()
@@ -67,18 +88,25 @@ func TestRunCommand(t *testing.T) {
 		exchangeName: "results",
 		key:          ""}
 
-	publishParams := standaloneProcessor.client.Transport.(*dummyTransport).publishParameters
+	publishParams :=
+		standaloneProcessor.client.Transport.(*dummyTransport).publishParameters
 
 	if publishParams.exchangeType != expectedPublishParams.exchangeType {
-		t.Errorf("Expected exchange type to be \"%s\" but got \"%s\" instead!", expectedPublishParams.exchangeType, publishParams.exchangeType)
+		t.Errorf("Expected exchange type to be \"%s\" but got \"%s\" instead!",
+			expectedPublishParams.exchangeType,
+			publishParams.exchangeType)
 	}
 
 	if publishParams.exchangeName != expectedPublishParams.exchangeName {
-		t.Errorf("Expected exchange name to be \"%s\" but got \"%s\" instead!", expectedPublishParams.exchangeName, publishParams.exchangeName)
+		t.Errorf("Expected exchange name to be \"%s\" but got \"%s\" instead!",
+			expectedPublishParams.exchangeName,
+			publishParams.exchangeName)
 	}
 
 	if publishParams.key != expectedPublishParams.key {
-		t.Errorf("Expected key to be \"%s\" but got \"%s\" instead!", expectedPublishParams.key, publishParams.key)
+		t.Errorf("Expected key to be \"%s\" but got \"%s\" instead!",
+			expectedPublishParams.key,
+			publishParams.key)
 	}
 
 	// Not particularly relevant here to validate the contents of the message

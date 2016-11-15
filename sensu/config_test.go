@@ -10,10 +10,12 @@ import (
 	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
 
-func validateStringParameter(actualRabbitMqUri string,
+func validateStringParameter(
+	actualRabbitMqUri string,
 	expectedRabbitMqUri string,
 	parameterName string,
 	t *testing.T) {
+
 	if actualRabbitMqUri != expectedRabbitMqUri {
 		t.Errorf("Expected "+parameterName+
 			" to be \"%s\" but got \"%s\" instead!",
@@ -56,18 +58,22 @@ var expectedClient = &stdClient.Client{Name: "test_client",
 	Subscriptions: strings.Split("email,messenger", ",")}
 
 func validateClient(actualClient *stdClient.Client, t *testing.T) {
-	validateStringParameter(actualClient.Name,
+	validateStringParameter(
+		actualClient.Name,
 		expectedClient.Name,
 		"client name",
 		t)
 
-	validateStringParameter(actualClient.Address,
+	validateStringParameter(
+		actualClient.Address,
 		expectedClient.Address,
 		"client address",
 		t)
 
-	if !reflect.DeepEqual(actualClient.Subscriptions,
+	if !reflect.DeepEqual(
+		actualClient.Subscriptions,
 		expectedClient.Subscriptions) {
+
 		t.Errorf("Expected client subscriptions to be \"%v\""+
 			" but got \"%v\" instead!",
 			expectedClient.Subscriptions,
@@ -84,7 +90,8 @@ func expectedClientFromConfig(t *testing.T) {
 func expectedClientFromEnvVars(t *testing.T) {
 	os.Setenv("SENSU_CLIENT_NAME", expectedClient.Name)
 	os.Setenv("SENSU_CLIENT_ADDRESS", expectedClient.Address)
-	os.Setenv("SENSU_CLIENT_SUBSCRIPTIONS",
+	os.Setenv(
+		"SENSU_CLIENT_SUBSCRIPTIONS",
 		strings.Join(expectedClient.Subscriptions, ","))
 
 	validateClient((&Config{}).Client(), t)
