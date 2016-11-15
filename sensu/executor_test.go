@@ -36,29 +36,35 @@ func validateCheckOutput(
 	}
 }
 
-func TestExecuteExtensionCheck(t *testing.T) {
-	check.Store["extension_check"] = &check.ExtensionCheck{
-		Function: func() check.ExtensionCheckResult {
-
-			return handler.Ok("Test")
-		}}
-
-	validateCheckOutput(
-		&stdCheck.CheckRequest{Check: &stdCheck.Check{Extension: "extension_check"}},
-		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"},
-		t)
+var checkTestFunction = func() check.ExtensionCheckResult {
+	return handler.Ok("Test")
 }
 
-func TestExecuteNamedExtensionCheck(t *testing.T) {
-	check.Store["named_extension_check"] = &check.ExtensionCheck{
-		Function: func() check.ExtensionCheckResult {
-			return handler.Ok("Test")
-		}}
+var extensionCheckTestData = []struct {
+	extensionCheck *check.ExtensionCheck
+	check          *stdCheck.Check
+	output         string
+}{
+	{
+		&check.ExtensionCheck{Function: checkTestFunction},
+		&stdCheck.Check{Name: "extension_check"},
+		"OK: Test"},
+	{
+		&check.ExtensionCheck{Function: checkTestFunction},
+		&stdCheck.Check{Name: "extension_check",
+			Extension: "named_extension_check"},
+		"OK: Test"},
+}
 
-	validateCheckOutput(
-		&stdCheck.CheckRequest{Check: &stdCheck.Check{Name: "named_extension_check"}},
-		&stdCheck.CheckOutput{Status: 0, Output: "OK: Test"},
-		t)
+func TestExecuteExtensionCheck(t *testing.T) {
+	for _, test := range extensionCheckTestData {
+		check.Store[test.check.Name] = test.extensionCheck
+
+		validateCheckOutput(
+			&stdCheck.CheckRequest{Check: test.check},
+			&stdCheck.CheckOutput{Status: 0, Output: test.output},
+			t)
+	}
 }
 
 func TestExecuteExternalCheck(t *testing.T) {
@@ -69,7 +75,6 @@ func TestExecuteExternalCheck(t *testing.T) {
 }
 
 func TestExecuteEmptyCheck(t *testing.T) {
-
 	output, err := executeCheck(
 		&stdCheck.CheckRequest{Check: &stdCheck.Check{}, Issued: 1479057736})
 
