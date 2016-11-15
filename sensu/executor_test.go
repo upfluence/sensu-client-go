@@ -30,7 +30,7 @@ func validateCheckOutput(
 	}
 
 	if output.Output != expectedOutput.Output {
-		t.Errorf("Expected output to be \"%d\" but got \"%d\" instead!",
+		t.Errorf("Expected output to be \"%s\" but got \"%s\" instead!",
 			expectedOutput.Output,
 			output.Output)
 	}

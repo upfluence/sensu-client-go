@@ -103,11 +103,11 @@ func TestChecksFromConfig(t *testing.T) {
 		config: &configPayload{
 			Checks: []*check.Check{&check.Check{}, &check.Check{}}}}
 
-	actualheckCount := len(config.Checks())
+	actualCheckCount := len(config.Checks())
 
-	if expectedCheckCount != actualheckCount {
-		t.Errorf("Expected check count to be \"%d\" but got \"%s\" instead!",
+	if expectedCheckCount != actualCheckCount {
+		t.Errorf("Expected check count to be \"%d\" but got \"%d\" instead!",
 			expectedCheckCount,
-			actualheckCount)
+			actualCheckCount)
 	}
 }

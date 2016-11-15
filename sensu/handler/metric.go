@@ -34,7 +34,7 @@ func (m *Metric) Render() check.ExtensionCheckResult {
 	}
 
 	return check.ExtensionCheckResult{
-		stdCheck.Success,
-		strings.Join(output, "\n"),
+		Status: stdCheck.Success,
+		Output: strings.Join(output, "\n"),
 	}
 }
