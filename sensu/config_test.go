@@ -17,8 +17,8 @@ func validateStringParameter(
 	t *testing.T) {
 
 	if actualRabbitMqUri != expectedRabbitMqUri {
-		t.Errorf("Expected "+parameterName+
-			" to be \"%s\" but got \"%s\" instead!",
+		t.Errorf("Expected %s to be \"%s\" but got \"%s\" instead!",
+			parameterName,
 			expectedRabbitMqUri,
 			actualRabbitMqUri)
 	}
