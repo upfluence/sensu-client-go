@@ -53,7 +53,7 @@ func (c *StandardCheck) Metric() check.ExtensionCheckResult {
 	v, err := c.Value()
 
 	if err == nil {
-		m.AddPoint(&handler.Point{c.MetricName, v})
+		m.AddPoint(&handler.Point{Name: c.MetricName, Value: v})
 	}
 	return m.Render()
 }

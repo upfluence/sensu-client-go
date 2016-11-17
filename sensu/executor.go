@@ -12,6 +12,8 @@ type CheckResponse struct {
 	Client string               `json:"client"`
 }
 
+var commandKeyError = errors.New("Command key not filled")
+
 func executeCheck(input *stdCheck.CheckRequest) (*stdCheck.CheckOutput, error) {
 	var output stdCheck.CheckOutput
 
@@ -20,7 +22,7 @@ func executeCheck(input *stdCheck.CheckRequest) (*stdCheck.CheckOutput, error) {
 	} else if ch, ok := check.Store[input.Name]; ok {
 		output = ch.Execute()
 	} else if input.Command == "" {
-		return nil, errors.New("Command key not filled")
+		return nil, commandKeyError
 	} else {
 		output = (&check.ExternalCheck{Request: input}).Execute()
 	}

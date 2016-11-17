@@ -44,7 +44,7 @@ func (s *Subscriber) Start() error {
 		case b := <-msgChan:
 			s.handleMessage(b)
 		case <-s.closeChan:
-			log.Warningf("Gracefull stop of %s", s.subscription)
+			log.Warningf("Graceful stop of %s", s.subscription)
 			stopChan <- true
 			return nil
 		}

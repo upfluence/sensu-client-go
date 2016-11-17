@@ -31,9 +31,11 @@ func (s *Standalone) Start() error {
 	for {
 		select {
 		case <-t:
-			s.execute()
+			if err := s.execute(); err != nil {
+				log.Errorf("Something went wrong: %s", err.Error())
+			}
 		case <-s.closeChan:
-			log.Warningf("Gracefull stop of %s", s.check.Name)
+			log.Warningf("Graceful stop of %s", s.check.Name)
 			return nil
 		}
 	}
@@ -43,7 +45,7 @@ func (s *Standalone) Close() {
 	s.closeChan <- true
 }
 
-func (s *Standalone) execute() {
+func (s *Standalone) execute() error {
 	if p, err := json.Marshal(s.check); err == nil {
 		log.Infof("Check received: %s", bytes.NewBuffer(p).String())
 	}
@@ -53,8 +55,7 @@ func (s *Standalone) execute() {
 	)
 
 	if err != nil {
-		log.Error(err.Error())
-		return
+		return err
 	}
 
 	p, err := json.Marshal(
@@ -62,9 +63,11 @@ func (s *Standalone) execute() {
 	)
 
 	if err != nil {
-		log.Errorf("Something went wrong: %s", err.Error())
+		return err
 	} else {
 		log.Noticef("Payload sent: %s", bytes.NewBuffer(p).String())
 		s.client.Transport.Publish("direct", "results", "", p)
 	}
+
+	return nil
 }
