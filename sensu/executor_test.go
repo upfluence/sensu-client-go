@@ -26,13 +26,15 @@ func validateCheckOutput(
 	if output.Status != expectedOutput.Status {
 		t.Errorf("Expected status to be \"%d\" but got \"%d\" instead!",
 			expectedOutput.Status,
-			output.Status)
+			output.Status,
+		)
 	}
 
 	if output.Output != expectedOutput.Output {
 		t.Errorf("Expected output to be \"%s\" but got \"%s\" instead!",
 			expectedOutput.Output,
-			output.Output)
+			output.Output,
+		)
 	}
 }
 
@@ -48,12 +50,15 @@ var extensionCheckTestData = []struct {
 	{
 		&check.ExtensionCheck{Function: checkTestFunction},
 		&stdCheck.Check{Name: "extension_check"},
-		"OK: Test"},
+		"OK: Test",
+	},
 	{
 		&check.ExtensionCheck{Function: checkTestFunction},
 		&stdCheck.Check{Name: "extension_check",
-			Extension: "named_extension_check"},
-		"OK: Test"},
+			Extension: "named_extension_check",
+		},
+		"OK: Test",
+	},
 }
 
 func TestExecuteExtensionCheck(t *testing.T) {
@@ -63,7 +68,8 @@ func TestExecuteExtensionCheck(t *testing.T) {
 		validateCheckOutput(
 			&stdCheck.CheckRequest{Check: test.check},
 			&stdCheck.CheckOutput{Status: 0, Output: test.output},
-			t)
+			t,
+		)
 	}
 }
 
@@ -71,17 +77,20 @@ func TestExecuteExternalCheck(t *testing.T) {
 	validateCheckOutput(
 		&stdCheck.CheckRequest{Check: &stdCheck.Check{Command: "printf Test"}},
 		&stdCheck.CheckOutput{Status: 0, Output: "Test"},
-		t)
+		t,
+	)
 }
 
 func TestExecuteEmptyCheck(t *testing.T) {
 	output, err := executeCheck(
-		&stdCheck.CheckRequest{Check: &stdCheck.Check{}, Issued: 1479057736})
+		&stdCheck.CheckRequest{Check: &stdCheck.Check{}, Issued: 1479057736},
+	)
 
 	if err != commandKeyError {
 		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
 			commandKeyError,
-			err)
+			err,
+		)
 	}
 
 	if output != nil {

@@ -15,7 +15,8 @@ func TestMissingCommandKey(t *testing.T) {
 	if err != commandKeyError {
 		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
 			commandKeyError,
-			err)
+			err,
+		)
 	}
 }
 
@@ -50,7 +51,9 @@ func (t *dummyTransport) Publish(
 		exchangeType,
 		exchangeName,
 		key,
-		message}
+		message,
+	}
+
 	return nil
 }
 
@@ -74,8 +77,12 @@ func TestRunCommand(t *testing.T) {
 		&Client{
 			Config: &Config{
 				config: &configPayload{
-					Client: &stdClient.Client{Name: "Test"}}},
-			Transport: &dummyTransport{}})
+					Client: &stdClient.Client{Name: "Test"},
+				},
+			},
+			Transport: &dummyTransport{},
+		},
+	)
 
 	err := standaloneProcessor.execute()
 
@@ -86,7 +93,8 @@ func TestRunCommand(t *testing.T) {
 	expectedPublishParams := transportPublishParameters{
 		exchangeType: "direct",
 		exchangeName: "results",
-		key:          ""}
+		key:          "",
+	}
 
 	publishParams :=
 		standaloneProcessor.client.Transport.(*dummyTransport).publishParameters
@@ -94,19 +102,22 @@ func TestRunCommand(t *testing.T) {
 	if publishParams.exchangeType != expectedPublishParams.exchangeType {
 		t.Errorf("Expected exchange type to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.exchangeType,
-			publishParams.exchangeType)
+			publishParams.exchangeType,
+		)
 	}
 
 	if publishParams.exchangeName != expectedPublishParams.exchangeName {
 		t.Errorf("Expected exchange name to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.exchangeName,
-			publishParams.exchangeName)
+			publishParams.exchangeName,
+		)
 	}
 
 	if publishParams.key != expectedPublishParams.key {
 		t.Errorf("Expected key to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.key,
-			publishParams.key)
+			publishParams.key,
+		)
 	}
 
 	// Not particularly relevant here to validate the contents of the message
