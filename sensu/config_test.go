@@ -17,7 +17,8 @@ func validateStringParameter(
 	t *testing.T) {
 
 	if actualRabbitMqUri != expectedRabbitMqUri {
-		t.Errorf("Expected %s to be \"%s\" but got \"%s\" instead!",
+		t.Errorf(
+			"Expected %s to be \"%s\" but got \"%s\" instead!",
 			parameterName,
 			expectedRabbitMqUri,
 			actualRabbitMqUri,
@@ -26,7 +27,8 @@ func validateStringParameter(
 }
 
 func TestRabbitMQURIDefaultValue(t *testing.T) {
-	validateStringParameter((&Config{}).RabbitMQURI(),
+	validateStringParameter(
+		(&Config{}).RabbitMQURI(),
 		"amqp://guest:guest@localhost:5672/%2f",
 		"RabbitMQ URI",
 		t,
@@ -38,7 +40,8 @@ func TestRabbitMQURIFromEnvVar(t *testing.T) {
 
 	os.Setenv("RABBITMQ_URI", expectedRabbitMqUri)
 
-	validateStringParameter((&Config{}).RabbitMQURI(),
+	validateStringParameter(
+		(&Config{}).RabbitMQURI(),
 		expectedRabbitMqUri,
 		"RabbitMQ URI",
 		t,
@@ -50,14 +53,16 @@ func TestRabbitMQURIFromConfig(t *testing.T) {
 
 	config := Config{config: &configPayload{RabbitMQURI: &expectedRabbitMqUri}}
 
-	validateStringParameter(config.RabbitMQURI(),
+	validateStringParameter(
+		config.RabbitMQURI(),
 		expectedRabbitMqUri,
 		"RabbitMQ URI",
 		t,
 	)
 }
 
-var expectedClient = &stdClient.Client{Name: "test_client",
+var expectedClient = &stdClient.Client{
+	Name:          "test_client",
 	Address:       "10.0.0.42",
 	Subscriptions: strings.Split("email,messenger", ","),
 }
@@ -82,8 +87,8 @@ func validateClient(actualClient *stdClient.Client, t *testing.T) {
 		expectedClient.Subscriptions,
 	) {
 
-		t.Errorf("Expected client subscriptions to be \"%v\""+
-			" but got \"%v\" instead!",
+		t.Errorf(
+			"Expected client subscriptions to be \"%v\" but got \"%v\" instead!",
 			expectedClient.Subscriptions,
 			actualClient.Subscriptions,
 		)
@@ -118,7 +123,8 @@ func TestChecksFromConfig(t *testing.T) {
 	actualCheckCount := len(config.Checks())
 
 	if expectedCheckCount != actualCheckCount {
-		t.Errorf("Expected check count to be \"%d\" but got \"%d\" instead!",
+		t.Errorf(
+			"Expected check count to be \"%d\" but got \"%d\" instead!",
 			expectedCheckCount,
 			actualCheckCount,
 		)

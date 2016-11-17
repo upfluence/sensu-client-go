@@ -13,7 +13,8 @@ func TestMissingCommandKey(t *testing.T) {
 	err := standaloneProcessor.execute()
 
 	if err != commandKeyError {
-		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
+		t.Fatalf(
+			"Expected error to be \"%s\" but got \"%s\" instead!",
 			commandKeyError,
 			err,
 		)
@@ -100,21 +101,24 @@ func TestRunCommand(t *testing.T) {
 		standaloneProcessor.client.Transport.(*dummyTransport).publishParameters
 
 	if publishParams.exchangeType != expectedPublishParams.exchangeType {
-		t.Errorf("Expected exchange type to be \"%s\" but got \"%s\" instead!",
+		t.Errorf(
+			"Expected exchange type to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.exchangeType,
 			publishParams.exchangeType,
 		)
 	}
 
 	if publishParams.exchangeName != expectedPublishParams.exchangeName {
-		t.Errorf("Expected exchange name to be \"%s\" but got \"%s\" instead!",
+		t.Errorf(
+			"Expected exchange name to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.exchangeName,
 			publishParams.exchangeName,
 		)
 	}
 
 	if publishParams.key != expectedPublishParams.key {
-		t.Errorf("Expected key to be \"%s\" but got \"%s\" instead!",
+		t.Errorf(
+			"Expected key to be \"%s\" but got \"%s\" instead!",
 			expectedPublishParams.key,
 			publishParams.key,
 		)

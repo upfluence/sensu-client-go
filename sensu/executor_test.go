@@ -24,14 +24,16 @@ func validateCheckOutput(
 	}
 
 	if output.Status != expectedOutput.Status {
-		t.Errorf("Expected status to be \"%d\" but got \"%d\" instead!",
+		t.Errorf(
+			"Expected status to be \"%d\" but got \"%d\" instead!",
 			expectedOutput.Status,
 			output.Status,
 		)
 	}
 
 	if output.Output != expectedOutput.Output {
-		t.Errorf("Expected output to be \"%s\" but got \"%s\" instead!",
+		t.Errorf(
+			"Expected output to be \"%s\" but got \"%s\" instead!",
 			expectedOutput.Output,
 			output.Output,
 		)
@@ -54,7 +56,8 @@ var extensionCheckTestData = []struct {
 	},
 	{
 		&check.ExtensionCheck{Function: checkTestFunction},
-		&stdCheck.Check{Name: "extension_check",
+		&stdCheck.Check{
+			Name:      "extension_check",
 			Extension: "named_extension_check",
 		},
 		"OK: Test",
@@ -87,7 +90,8 @@ func TestExecuteEmptyCheck(t *testing.T) {
 	)
 
 	if err != commandKeyError {
-		t.Fatalf("Expected error to be \"%s\" but got \"%s\" instead!",
+		t.Fatalf(
+			"Expected error to be \"%s\" but got \"%s\" instead!",
 			commandKeyError,
 			err,
 		)
