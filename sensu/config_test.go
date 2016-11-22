@@ -95,13 +95,13 @@ func validateClient(actualClient *stdClient.Client, t *testing.T) {
 	}
 }
 
-func expectedClientFromConfig(t *testing.T) {
+func TestExpectedClientFromConfig(t *testing.T) {
 	config := Config{config: &configPayload{Client: expectedClient}}
 
 	validateClient(config.Client(), t)
 }
 
-func expectedClientFromEnvVars(t *testing.T) {
+func TestExpectedClientFromEnvVars(t *testing.T) {
 	os.Setenv("SENSU_CLIENT_NAME", expectedClient.Name)
 	os.Setenv("SENSU_CLIENT_ADDRESS", expectedClient.Address)
 	os.Setenv(
