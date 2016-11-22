@@ -39,6 +39,7 @@ func TestRabbitMQURIFromEnvVar(t *testing.T) {
 	expectedRabbitMqUri := "amqp://user:password@example.com:5672"
 
 	os.Setenv("RABBITMQ_URI", expectedRabbitMqUri)
+	defer os.Unsetenv("RABBITMQ_URI")
 
 	validateStringParameter(
 		(&Config{}).RabbitMQURI(),
@@ -61,13 +62,7 @@ func TestRabbitMQURIFromConfig(t *testing.T) {
 	)
 }
 
-var expectedClient = &stdClient.Client{
-	Name:          "test_client",
-	Address:       "10.0.0.42",
-	Subscriptions: strings.Split("email,messenger", ","),
-}
-
-func validateClient(actualClient *stdClient.Client, t *testing.T) {
+func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Client, t *testing.T) {
 	validateStringParameter(
 		actualClient.Name,
 		expectedClient.Name,
@@ -86,30 +81,53 @@ func validateClient(actualClient *stdClient.Client, t *testing.T) {
 		actualClient.Subscriptions,
 		expectedClient.Subscriptions,
 	) {
-
 		t.Errorf(
-			"Expected client subscriptions to be \"%v\" but got \"%v\" instead!",
+			"Expected client subscriptions to be \"%#v\" but got \"%#v\" instead!",
 			expectedClient.Subscriptions,
 			actualClient.Subscriptions,
 		)
 	}
 }
 
-func TestExpectedClientFromConfig(t *testing.T) {
-	config := Config{config: &configPayload{Client: expectedClient}}
+var dummyClient = &stdClient.Client{
+	Name:          "test_client",
+	Address:       "10.0.0.42",
+	Subscriptions: strings.Split("email,messenger", ","),
+}
 
-	validateClient(config.Client(), t)
+func TestExpectedClientFromConfig(t *testing.T) {
+	config := Config{config: &configPayload{Client: dummyClient}}
+
+	validateClient(config.Client(), dummyClient, t)
 }
 
 func TestExpectedClientFromEnvVars(t *testing.T) {
-	os.Setenv("SENSU_CLIENT_NAME", expectedClient.Name)
-	os.Setenv("SENSU_CLIENT_ADDRESS", expectedClient.Address)
+	os.Setenv("SENSU_CLIENT_NAME", dummyClient.Name)
+	defer os.Unsetenv("SENSU_CLIENT_NAME")
+
+	os.Setenv("SENSU_CLIENT_ADDRESS", dummyClient.Address)
+	defer os.Unsetenv("SENSU_CLIENT_ADDRESS")
+
 	os.Setenv(
 		"SENSU_CLIENT_SUBSCRIPTIONS",
-		strings.Join(expectedClient.Subscriptions, ","),
+		strings.Join(dummyClient.Subscriptions, ","),
 	)
+	defer os.Unsetenv("SENSU_CLIENT_SUBSCRIPTIONS")
 
-	validateClient((&Config{}).Client(), t)
+	validateClient((&Config{}).Client(), dummyClient, t)
+}
+
+func TestExpectedClientFromEnvVarsNoSubscriptions(t *testing.T) {
+	dummyClientNoSubscriptions := dummyClient
+	dummyClientNoSubscriptions.Subscriptions = []string{}
+
+	os.Setenv("SENSU_CLIENT_NAME", dummyClientNoSubscriptions.Name)
+	defer os.Unsetenv("SENSU_CLIENT_NAME")
+
+	os.Setenv("SENSU_CLIENT_ADDRESS", dummyClientNoSubscriptions.Address)
+	defer os.Unsetenv("SENSU_CLIENT_ADDRESS")
+
+	validateClient((&Config{}).Client(), dummyClientNoSubscriptions, t)
 }
 
 func TestChecksFromConfig(t *testing.T) {
