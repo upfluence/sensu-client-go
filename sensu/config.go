@@ -38,6 +38,16 @@ func fetchEnv(envs ...string) string {
 	return ""
 }
 
+// split is a wrapper for strings.Split, which returns an empty array
+// for empty string inputs instead of an array containing an empty string
+func split(str string, token string) []string {
+	if len(str) == 0 {
+		return []string{}
+	}
+
+	return strings.Split(str, token)
+}
+
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 	var cfg = Config{flagset, &configPayload{}}
 
@@ -74,7 +84,7 @@ func (c *Config) Client() *client.Client {
 	return &client.Client{
 		Name:          os.Getenv("SENSU_CLIENT_NAME"),
 		Address:       fetchEnv("SENSU_CLIENT_ADDRESS", "SENSU_ADDRESS"),
-		Subscriptions: strings.Split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
+		Subscriptions: split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
 	}
 }
 
