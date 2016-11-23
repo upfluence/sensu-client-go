@@ -38,7 +38,7 @@ func fetchEnv(envs ...string) string {
 	return ""
 }
 
-// tokenizeString is a wrapper for strings.Split, which returns an empty array
+// split is a wrapper for strings.Split, which returns an empty array
 // for empty string inputs instead of an array containing an empty string
 func split(str string, token string) []string {
 	if len(str) == 0 {
