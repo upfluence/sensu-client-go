@@ -10,6 +10,12 @@ import (
 	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
 
+var dummyClient = &stdClient.Client{
+	Name:          "test_client",
+	Address:       "10.0.0.42",
+	Subscriptions: strings.Split("email,messenger", ","),
+}
+
 func validateStringParameter(
 	actualRabbitMqUri string,
 	expectedRabbitMqUri string,
@@ -87,12 +93,6 @@ func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Cl
 			actualClient.Subscriptions,
 		)
 	}
-}
-
-var dummyClient = &stdClient.Client{
-	Name:          "test_client",
-	Address:       "10.0.0.42",
-	Subscriptions: strings.Split("email,messenger", ","),
 }
 
 func TestClientFromConfig(t *testing.T) {
