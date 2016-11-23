@@ -95,13 +95,13 @@ var dummyClient = &stdClient.Client{
 	Subscriptions: strings.Split("email,messenger", ","),
 }
 
-func TestExpectedClientFromConfig(t *testing.T) {
+func TestClientFromConfig(t *testing.T) {
 	config := Config{config: &configPayload{Client: dummyClient}}
 
 	validateClient(config.Client(), dummyClient, t)
 }
 
-func TestExpectedClientFromEnvVars(t *testing.T) {
+func TestClientFromEnvVars(t *testing.T) {
 	os.Setenv("SENSU_CLIENT_NAME", dummyClient.Name)
 	defer os.Unsetenv("SENSU_CLIENT_NAME")
 
@@ -117,7 +117,7 @@ func TestExpectedClientFromEnvVars(t *testing.T) {
 	validateClient((&Config{}).Client(), dummyClient, t)
 }
 
-func TestExpectedClientFromEnvVarsNoSubscriptions(t *testing.T) {
+func TestClientFromEnvVarsNoSubscriptions(t *testing.T) {
 	dummyClientNoSubscriptions := dummyClient
 	dummyClientNoSubscriptions.Subscriptions = []string{}
 
