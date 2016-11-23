@@ -17,17 +17,17 @@ var dummyClient = &stdClient.Client{
 }
 
 func validateStringParameter(
-	actualRabbitMqUri string,
-	expectedRabbitMqUri string,
+	actual string,
+	expected string,
 	parameterName string,
 	t *testing.T) {
 
-	if actualRabbitMqUri != expectedRabbitMqUri {
+	if actual != expected {
 		t.Errorf(
 			"Expected %s to be \"%s\" but got \"%s\" instead!",
 			parameterName,
-			expectedRabbitMqUri,
-			actualRabbitMqUri,
+			expected,
+			actual,
 		)
 	}
 }
