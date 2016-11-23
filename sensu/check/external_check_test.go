@@ -15,7 +15,7 @@ func TestEmptyCommand(t *testing.T) {
 		t.Errorf("The status is not failed, %d", r.Status)
 	}
 
-	if r.Duration <= 0.0 {
+	if r.Duration < 0.0 {
 		t.Errorf("The duration is not positive: %f", r.Duration)
 	}
 }
@@ -29,7 +29,7 @@ func TestCorrectCommand(t *testing.T) {
 		t.Errorf("The status is not success, %d", r.Status)
 	}
 
-	if r.Duration <= 0.0 {
+	if r.Duration < 0.0 {
 		t.Errorf("The duration is not positive: %f", r.Duration)
 	}
 }
@@ -43,7 +43,7 @@ func TestOtherExitCodeCommand(t *testing.T) {
 		t.Errorf("The status is not success, %d", r.Status)
 	}
 
-	if r.Duration <= 0.0 {
+	if r.Duration < 0.0 {
 		t.Errorf("The duration is not positive: %f", r.Duration)
 	}
 }

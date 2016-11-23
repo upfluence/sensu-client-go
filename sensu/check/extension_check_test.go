@@ -21,7 +21,7 @@ func TestExtension(t *testing.T) {
 		t.Errorf("Wrong output: %s", r.Output)
 	}
 
-	if r.Duration <= 0.0 {
+	if r.Duration < 0.0 {
 		t.Errorf("The duration is not positive: %f", r.Duration)
 	}
 }
