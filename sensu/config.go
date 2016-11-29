@@ -64,11 +64,7 @@ func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, erro
 
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 	if flagset != nil && flagset.configFile != "" {
-		cfg, err := NewConfigFromFile(flagset, flagset.configFile)
-		if err != nil {
-			return nil, err
-		}
-		return cfg, nil
+		return NewConfigFromFile(flagset, flagset.configFile)
 	} else {
 		var cfg = Config{flagset, &configPayload{}}
 		return &cfg, nil
