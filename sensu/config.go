@@ -48,22 +48,25 @@ func split(str string, token string) []string {
 	return strings.Split(str, token)
 }
 
-func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
-	var cfg = Config{flagset, &configPayload{}}
+func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, error) {
+	cfg := Config{flagset, &configPayload{}}
+	buf, err := ioutil.ReadFile(configFile)
 
-	if flagset != nil && flagset.configFile != "" {
-		buf, err := ioutil.ReadFile(flagset.configFile)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if err := json.Unmarshal(buf, &cfg.config); err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
+	if err := json.Unmarshal(buf, &cfg.config); err != nil {
+		return nil, err
+	}
 	return &cfg, nil
+}
+
+func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
+	if flagset != nil && flagset.configFile != "" {
+		return NewConfigFromFile(flagset, flagset.configFile)
+	}
+	return &Config{flagset, &configPayload{}}, nil
 }
 
 func (c *Config) RabbitMQURI() string {
