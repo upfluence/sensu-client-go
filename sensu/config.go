@@ -2,7 +2,6 @@ package sensu
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -50,7 +49,7 @@ func split(str string, token string) []string {
 }
 
 func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, error) {
-	var cfg = Config{flagset, &configPayload{}}
+	cfg := Config{flagset, &configPayload{}}
 	buf, err := ioutil.ReadFile(configFile)
 
 	if err != nil {
@@ -64,21 +63,16 @@ func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, erro
 }
 
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
-	var cfg = Config{flagset, &configPayload{}}
-
 	if flagset != nil && flagset.configFile != "" {
-		buf, err := ioutil.ReadFile(flagset.configFile)
-
+		cfg, err := NewConfigFromFile(flagset, flagset.configFile)
 		if err != nil {
 			return nil, err
 		}
-
-		if err := json.Unmarshal(buf, &cfg.config); err != nil {
-			return nil, err
-		}
+		return cfg, nil
+	} else {
+		var cfg = Config{flagset, &configPayload{}}
 		return &cfg, nil
 	}
-	return nil, errors.New("No config file is set")
 
 }
 
