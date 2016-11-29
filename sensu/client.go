@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	currentVersion    = "1.0.1"
+	currentVersion    = "1.1.0"
 	connectionTimeout = 5 * time.Second
 )
 
