@@ -65,11 +65,8 @@ func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, erro
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
 	if flagset != nil && flagset.configFile != "" {
 		return NewConfigFromFile(flagset, flagset.configFile)
-	} else {
-		var cfg = Config{flagset, &configPayload{}}
-		return &cfg, nil
 	}
-
+	return &Config{flagset, &configPayload{}}, nil
 }
 
 func (c *Config) RabbitMQURI() string {
