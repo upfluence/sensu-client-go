@@ -148,3 +148,9 @@ func TestChecksFromConfig(t *testing.T) {
 		)
 	}
 }
+
+func TestNewConfigFromFile(t *testing.T) {
+	if c, err := NewConfigFromFile(nil, ""); c != nil || err != errNoClientName {
+		t.Errorf("Expected (nil, %v) but got (%v, %v)", errNoClientName, c, err)
+	}
+}

@@ -2,6 +2,7 @@ package sensu
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -11,6 +12,8 @@ import (
 )
 
 const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2f"
+
+var errNoClientName = errors.New("No client name provided")
 
 type configFlagSet struct {
 	configFile string
@@ -50,23 +53,34 @@ func split(str string, token string) []string {
 
 func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, error) {
 	cfg := Config{flagset, &configPayload{}}
-	buf, err := ioutil.ReadFile(configFile)
 
-	if err != nil {
-		return nil, err
+	if configFile != "" {
+		buf, err := ioutil.ReadFile(configFile)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if err := json.Unmarshal(buf, &cfg.config); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := json.Unmarshal(buf, &cfg.config); err != nil {
-		return nil, err
+	if cfg.Client().Name == "" {
+		return nil, errNoClientName
 	}
+
 	return &cfg, nil
 }
 
 func NewConfigFromFlagSet(flagset *configFlagSet) (*Config, error) {
-	if flagset != nil && flagset.configFile != "" {
-		return NewConfigFromFile(flagset, flagset.configFile)
+	var file string
+
+	if flagset != nil {
+		file = flagset.configFile
 	}
-	return &Config{flagset, &configPayload{}}, nil
+
+	return NewConfigFromFile(flagset, file)
 }
 
 func (c *Config) RabbitMQURI() string {
