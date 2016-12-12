@@ -12,7 +12,7 @@ import (
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 )
 
-const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2f"
+const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2F"
 
 var errNoClientName = errors.New("No client name provided")
 

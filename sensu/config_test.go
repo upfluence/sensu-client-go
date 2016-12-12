@@ -35,7 +35,7 @@ func validateStringParameter(
 func TestRabbitMQURIDefaultValue(t *testing.T) {
 	validateStringParameter(
 		(&Config{}).RabbitMQURI(),
-		"amqp://guest:guest@localhost:5672/%2f",
+		"amqp://guest:guest@localhost:5672/%2F",
 		"RabbitMQ URI",
 		t,
 	)
