@@ -35,7 +35,7 @@ func validateStringParameter(
 func TestRabbitMQURIDefaultValue(t *testing.T) {
 	validateStringParameter(
 		(&Config{}).RabbitMQURI(),
-		"amqp://guest:guest@localhost:5672/%2F",
+		defaultRabbitMQURI,
 		"RabbitMQ URI",
 		t,
 	)
@@ -153,4 +153,25 @@ func TestNewConfigFromFile(t *testing.T) {
 	if c, err := NewConfigFromFile(nil, ""); c != nil || err != errNoClientName {
 		t.Errorf("Expected (nil, %v) but got (%v, %v)", errNoClientName, c, err)
 	}
+}
+
+func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
+	haConfig := (&Config{}).RabbitMQHAConfig()
+
+	expectedConfigCont := 1
+
+	if len(haConfig) != expectedConfigCont {
+		t.Errorf(
+			"Expected the config count to be \"%d\" but got \"%d\" instead!",
+			expectedConfigCont,
+			len(haConfig),
+		)
+	}
+
+	validateStringParameter(
+		haConfig[0].GetURI(),
+		defaultRabbitMQURI,
+		"RabbitMQ URI",
+		t,
+	)
 }
