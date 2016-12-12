@@ -162,7 +162,7 @@ func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
 
 	if len(haConfig) != expectedConfigCont {
 		t.Errorf(
-			"Expected the config count to be \"%d\" but got \"%d\" instead!",
+			"Expected the config count to be %d but got %d instead!",
 			expectedConfigCont,
 			len(haConfig),
 		)
