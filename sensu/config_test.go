@@ -142,7 +142,7 @@ func TestChecksFromConfig(t *testing.T) {
 
 	if expectedCheckCount != actualCheckCount {
 		t.Errorf(
-			"Expected check count to be \"%d\" but got \"%d\" instead!",
+			"Expected check count to be %d but got %d instead!",
 			expectedCheckCount,
 			actualCheckCount,
 		)
@@ -156,7 +156,14 @@ func TestNewConfigFromFile(t *testing.T) {
 }
 
 func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
-	haConfig := (&Config{}).RabbitMQHAConfig()
+	haConfig, err := (&Config{}).RabbitMQHAConfig()
+
+	if err != nil {
+		t.Errorf(
+			"Expected a nil error but got \"%s\" instead!",
+			err,
+		)
+	}
 
 	expectedConfigCont := 1
 

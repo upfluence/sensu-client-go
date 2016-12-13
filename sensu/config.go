@@ -98,14 +98,18 @@ func (c *Config) RabbitMQURI() string {
 // RabbitMQHAConfig superseeds RabbitMQURI() by first checking
 // for a HA cluster configuration and then calling RabbitMQURI()
 // if it can't find one
-func (c *Config) RabbitMQHAConfig() []*rabbitmq.TransportConfig {
+func (c *Config) RabbitMQHAConfig() ([]*rabbitmq.TransportConfig, error) {
 	if cfg := c.config; cfg != nil && cfg.RabbitMQTransport != nil {
-		return cfg.RabbitMQTransport
+		return cfg.RabbitMQTransport, nil
 	}
 
-	config, _ := rabbitmq.NewTransportConfig(c.RabbitMQURI())
+	config, err := rabbitmq.NewTransportConfig(c.RabbitMQURI())
 
-	return []*rabbitmq.TransportConfig{config}
+	if err != nil {
+		return []*rabbitmq.TransportConfig{}, err
+	}
+
+	return []*rabbitmq.TransportConfig{config}, err
 }
 
 func (c *Config) Client() *client.Client {
