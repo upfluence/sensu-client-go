@@ -27,10 +27,10 @@ type Config struct {
 }
 
 type configPayload struct {
-	Client            *client.Client                      `json:"client,omitempty"`
-	Checks            []*check.Check                      `json:"checks,omitempty"`
-	RabbitMQURI       *string                             `json:"rabbitmq_uri,omitempty"`
-	RabbitMQTransport []*rabbitmq.RabbitMQTransportConfig `json:"rabbitmq,omitempty"`
+	Client            *client.Client              `json:"client,omitempty"`
+	Checks            []*check.Check              `json:"checks,omitempty"`
+	RabbitMQURI       *string                     `json:"rabbitmq_uri,omitempty"`
+	RabbitMQTransport []*rabbitmq.TransportConfig `json:"rabbitmq,omitempty"`
 }
 
 func fetchEnv(envs ...string) string {
@@ -98,14 +98,14 @@ func (c *Config) RabbitMQURI() string {
 // RabbitMQHAConfig superseeds RabbitMQURI() by first checking
 // for a HA cluster configuration and then calling RabbitMQURI()
 // if it can't find one
-func (c *Config) RabbitMQHAConfig() []*rabbitmq.RabbitMQTransportConfig {
+func (c *Config) RabbitMQHAConfig() []*rabbitmq.TransportConfig {
 	if cfg := c.config; cfg != nil && cfg.RabbitMQTransport != nil {
 		return cfg.RabbitMQTransport
 	}
 
-	config, _ := rabbitmq.NewRabbitMQTransportConfig(c.RabbitMQURI())
+	config, _ := rabbitmq.NewTransportConfig(c.RabbitMQURI())
 
-	return []*rabbitmq.RabbitMQTransportConfig{config}
+	return []*rabbitmq.TransportConfig{config}
 }
 
 func (c *Config) Client() *client.Client {
