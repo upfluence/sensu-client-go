@@ -109,7 +109,7 @@ func (c *Config) RabbitMQHAConfig() ([]*rabbitmq.TransportConfig, error) {
 		return []*rabbitmq.TransportConfig{}, err
 	}
 
-	return []*rabbitmq.TransportConfig{config}, err
+	return []*rabbitmq.TransportConfig{config}, nil
 }
 
 func (c *Config) Client() *client.Client {
