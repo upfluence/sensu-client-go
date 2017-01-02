@@ -1,0 +1,43 @@
+{
+  "client": {
+    "name": "fiz",
+    "address": "192.168.1.1"
+  },
+  "checks": [
+    {
+      "name": "check-1",
+      "standalone": true,
+      "interval": 5,
+      "command": "ls ."
+    }
+  ],
+  "rabbitmq": [
+    {
+      "host": "10.0.0.6",
+      "port": "5672",
+      "vhost": "/",
+      "user": "guest",
+      "password": "guest",
+      "heartbeat": 30,
+      "prefetch": 50
+    },
+    {
+      "host": "10.0.0.7",
+      "port": "5672",
+      "vhost": "/",
+      "user": "guest",
+      "password": "guest",
+      "heartbeat": 30,
+      "prefetch": 50
+    },
+    {
+      "host": "10.0.0.8",
+      "port": "5672",
+      "vhost": "/",
+      "user": "guest",
+      "password": "guest",
+      "heartbeat": 30,
+      "prefetch": 50
+    }
+  ]
+}

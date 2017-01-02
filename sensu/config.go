@@ -9,9 +9,10 @@ import (
 
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 )
 
-const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2f"
+const defaultRabbitMQURI string = "amqp://guest:guest@localhost:5672/%2F"
 
 var errNoClientName = errors.New("No client name provided")
 
@@ -26,9 +27,10 @@ type Config struct {
 }
 
 type configPayload struct {
-	Client      *client.Client `json:"client,omitempty"`
-	Checks      []*check.Check `json:"checks,omitempty"`
-	RabbitMQURI *string        `json:"rabbitmq_uri,omitempty"`
+	Client            *client.Client              `json:"client,omitempty"`
+	Checks            []*check.Check              `json:"checks,omitempty"`
+	RabbitMQURI       *string                     `json:"rabbitmq_uri,omitempty"`
+	RabbitMQTransport []*rabbitmq.TransportConfig `json:"rabbitmq,omitempty"`
 }
 
 func fetchEnv(envs ...string) string {
@@ -91,6 +93,23 @@ func (c *Config) RabbitMQURI() string {
 	}
 
 	return defaultRabbitMQURI
+}
+
+// RabbitMQHAConfig superseeds RabbitMQURI() by first checking
+// for a HA cluster configuration and then calling RabbitMQURI()
+// if it can't find one
+func (c *Config) RabbitMQHAConfig() ([]*rabbitmq.TransportConfig, error) {
+	if cfg := c.config; cfg != nil && cfg.RabbitMQTransport != nil {
+		return cfg.RabbitMQTransport, nil
+	}
+
+	config, err := rabbitmq.NewTransportConfig(c.RabbitMQURI())
+
+	if err != nil {
+		return []*rabbitmq.TransportConfig{}, err
+	}
+
+	return []*rabbitmq.TransportConfig{config}, nil
 }
 
 func (c *Config) Client() *client.Client {
