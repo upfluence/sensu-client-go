@@ -88,8 +88,13 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
-	client := sensu.NewClient(t, cfg)
+	t, err := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
+
+  if err != nil {
+		log.Fatal(err.Error())
+	}
+
+  client := sensu.NewClient(t, cfg)
 
 	check.Store["http_check"] = &check.ExtensionCheck{HTTPCheck}
 
@@ -143,7 +148,12 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	t := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
+	t, err := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
+
+  if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	client := sensu.NewClient(t, cfg)
 
 	check.Store["http_duration_check"] = &check.ExtensionCheck{c.Check}

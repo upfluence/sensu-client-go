@@ -14,7 +14,12 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	t, _ := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
+	t, err := rabbitmq.NewRabbitMQTransport(cfg.RabbitMQURI())
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	client := sensu.NewClient(t, cfg)
 
 	client.Start()
