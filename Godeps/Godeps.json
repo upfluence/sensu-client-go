@@ -16,7 +16,11 @@
 		},
 		{
 			"ImportPath": "github.com/upfluence/goutils/log",
-			"Rev": "68c709fd53acf89b8ccbe6664d26778197fcdb6f"
+			"Rev": "d45b43a93f900719aaac7cfc4bbd1dfeb6081267"
+		},
+		{
+			"ImportPath": "github.com/upfluence/goutils/testing/utils",
+			"Rev": "d45b43a93f900719aaac7cfc4bbd1dfeb6081267"
 		},
 		{
 			"ImportPath": "github.com/upfluence/sensu-go/sensu/check",

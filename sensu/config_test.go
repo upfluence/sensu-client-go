@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/testing/utils"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
@@ -16,24 +17,8 @@ var dummyClient = &stdClient.Client{
 	Subscriptions: strings.Split("email,messenger", ","),
 }
 
-func validateStringParameter(
-	actual string,
-	expected string,
-	parameterName string,
-	t *testing.T) {
-
-	if actual != expected {
-		t.Errorf(
-			"Expected %s to be \"%s\" but got \"%s\" instead!",
-			parameterName,
-			expected,
-			actual,
-		)
-	}
-}
-
 func TestRabbitMQURIDefaultValue(t *testing.T) {
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		(&Config{}).RabbitMQURI(),
 		defaultRabbitMQURI,
 		"RabbitMQ URI",
@@ -47,7 +32,7 @@ func TestRabbitMQURIFromEnvVar(t *testing.T) {
 	os.Setenv("RABBITMQ_URI", expectedRabbitMqUri)
 	defer os.Unsetenv("RABBITMQ_URI")
 
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		(&Config{}).RabbitMQURI(),
 		expectedRabbitMqUri,
 		"RabbitMQ URI",
@@ -60,7 +45,7 @@ func TestRabbitMQURIFromConfig(t *testing.T) {
 
 	config := Config{config: &configPayload{RabbitMQURI: &expectedRabbitMqUri}}
 
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		config.RabbitMQURI(),
 		expectedRabbitMqUri,
 		"RabbitMQ URI",
@@ -69,14 +54,14 @@ func TestRabbitMQURIFromConfig(t *testing.T) {
 }
 
 func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Client, t *testing.T) {
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		actualClient.Name,
 		expectedClient.Name,
 		"client name",
 		t,
 	)
 
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		actualClient.Address,
 		expectedClient.Address,
 		"client address",
@@ -175,7 +160,7 @@ func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
 		)
 	}
 
-	validateStringParameter(
+	utils.ValidateStringParameter(
 		haConfig[0].GetURI(),
 		defaultRabbitMQURI,
 		"RabbitMQ URI",
