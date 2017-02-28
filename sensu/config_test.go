@@ -3,6 +3,7 @@ package sensu
 import (
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -166,4 +167,32 @@ func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
 		"RabbitMQ URI",
 		t,
 	)
+}
+
+func TestClientDuplicateSubscriptions(t *testing.T) {
+
+	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-dupeSubs.json")
+	expectedSubscriptions := strings.Split("unique,duplicate,client:foo", ",")
+
+	if err != nil {
+		t.Errorf(
+			"Expected a nil error but got \"%s\" instead!",
+			err,
+		)
+	}
+
+	sort.Strings(expectedSubscriptions)
+	sort.Strings(tCaseCfg.config.Client.Subscriptions)
+
+	if !reflect.DeepEqual(
+		tCaseCfg.config.Client.Subscriptions,
+		expectedSubscriptions,
+	) {
+
+		t.Errorf(
+			"Expected client subscriptions to be \"%#v\" but got \"%#v\" instead!",
+			tCaseCfg.config.Client.Subscriptions,
+			expectedSubscriptions,
+		)
+	}
 }
