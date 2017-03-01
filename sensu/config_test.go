@@ -181,18 +181,63 @@ func TestClientDuplicateSubscriptions(t *testing.T) {
 		)
 	}
 
-	sort.Strings(expectedSubscriptions)
-	sort.Strings(tCaseCfg.config.Client.Subscriptions)
-
-	if !reflect.DeepEqual(
+	validateClientSubscriptions(
 		tCaseCfg.config.Client.Subscriptions,
 		expectedSubscriptions,
-	) {
+		t,
+	)
+}
+
+func TestClientNoSubscriptions(t *testing.T) {
+
+	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-noSubs.json")
+	expectedSubscriptions := []string{"client:foo"}
+
+	if err != nil {
+		t.Errorf(
+			"Expected a nil error but got \"%s\" instead!",
+			err,
+		)
+	}
+
+	validateClientSubscriptions(
+		tCaseCfg.config.Client.Subscriptions,
+		expectedSubscriptions,
+		t,
+	)
+}
+
+func TestClientUniqueSubscriptions(t *testing.T) {
+
+	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-uniqueSubs.json")
+	expectedSubscriptions := strings.Split("unique1,unique2,unique3,client:foo", ",")
+
+	if err != nil {
+		t.Errorf(
+			"Expected a nil error but got \"%s\" instead!",
+			err,
+		)
+	}
+
+	validateClientSubscriptions(
+		tCaseCfg.config.Client.Subscriptions,
+		expectedSubscriptions,
+		t,
+	)
+}
+
+func validateClientSubscriptions(s1 []string, s2 []string, t *testing.T) {
+
+	sort.Strings(s1)
+	sort.Strings(s2)
+
+	if !reflect.DeepEqual(s1, s2){
 
 		t.Errorf(
 			"Expected client subscriptions to be \"%#v\" but got \"%#v\" instead!",
-			tCaseCfg.config.Client.Subscriptions,
-			expectedSubscriptions,
+			s1,
+			s2,
 		)
 	}
+
 }
