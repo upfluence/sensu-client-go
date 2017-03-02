@@ -169,61 +169,42 @@ func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
 	)
 }
 
-func TestClientDuplicateSubscriptions(t *testing.T) {
+func TestSubscriptionBehaviour(t *testing.T) {
 
-	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-dupeSubs.json")
-	expectedSubscriptions := strings.Split("unique,duplicate,client:foo", ",")
+	for _, tCase := range []struct {
+		in  string
+		out []string
+	}{
+		{
+			"testdata/client-noSubs.json",
+			[]string{"client:foo"},
+		},
+		{
+			"testdata/client-dupeSubs.json",
+			strings.Split("unique,duplicate,client:foo", ","),
+		},
+		{
+			"testdata/client-uniqueSubs.json",
+			strings.Split("unique1,unique2,unique3,client:foo", ","),
+		},
+	} {
 
-	if err != nil {
-		t.Errorf(
-			"Expected a nil error but got \"%s\" instead!",
-			err,
+		tCaseCfg, err := NewConfigFromFile(nil, tCase.in)
+
+		if err != nil {
+			t.Errorf(
+				"Expected a nil error but got \"%s\" instead!",
+				err,
+			)
+		}
+
+		validateClientSubscriptions(
+			tCaseCfg.config.Client.Subscriptions,
+			tCase.out,
+			t,
 		)
 	}
 
-	validateClientSubscriptions(
-		tCaseCfg.config.Client.Subscriptions,
-		expectedSubscriptions,
-		t,
-	)
-}
-
-func TestClientNoSubscriptions(t *testing.T) {
-
-	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-noSubs.json")
-	expectedSubscriptions := []string{"client:foo"}
-
-	if err != nil {
-		t.Errorf(
-			"Expected a nil error but got \"%s\" instead!",
-			err,
-		)
-	}
-
-	validateClientSubscriptions(
-		tCaseCfg.config.Client.Subscriptions,
-		expectedSubscriptions,
-		t,
-	)
-}
-
-func TestClientUniqueSubscriptions(t *testing.T) {
-
-	tCaseCfg, err := NewConfigFromFile(nil, "testdata/client-uniqueSubs.json")
-	expectedSubscriptions := strings.Split("unique1,unique2,unique3,client:foo", ",")
-
-	if err != nil {
-		t.Errorf(
-			"Expected a nil error but got \"%s\" instead!",
-			err,
-		)
-	}
-
-	validateClientSubscriptions(
-		tCaseCfg.config.Client.Subscriptions,
-		expectedSubscriptions,
-		t,
-	)
 }
 
 func validateClientSubscriptions(s1 []string, s2 []string, t *testing.T) {
@@ -231,7 +212,7 @@ func validateClientSubscriptions(s1 []string, s2 []string, t *testing.T) {
 	sort.Strings(s1)
 	sort.Strings(s2)
 
-	if !reflect.DeepEqual(s1, s2){
+	if !reflect.DeepEqual(s1, s2) {
 
 		t.Errorf(
 			"Expected client subscriptions to be \"%#v\" but got \"%#v\" instead!",
