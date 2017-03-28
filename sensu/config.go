@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"fmt"
 
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
@@ -72,6 +73,16 @@ func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, erro
 		return nil, errNoClientName
 	}
 
+	// If we reached this point, we have a client name.
+	// emulate ruby client behavior: add default subscription - client:name
+	// Without at least one subscription sensu server will crash.
+	cfg.config.Client.Subscriptions = removeDuplicates(
+	    append(
+	        cfg.config.Client.Subscriptions,
+	        fmt.Sprintf("client:%s", cfg.config.Client.Name),
+	    ),
+	)
+
 	return &cfg, nil
 }
 
@@ -130,4 +141,21 @@ func (c *Config) Checks() []*check.Check {
 	}
 
 	return []*check.Check{}
+}
+
+// Removes duplicates from string slices
+func removeDuplicates(xs []string) []string {
+
+	temp := make(map[string]bool)
+	result := []string{}
+
+	for _, x := range xs {
+	   temp[x] = true
+	}
+
+	for k, _ := range temp {
+	  result = append(result, k)
+	}
+
+	return result
 }

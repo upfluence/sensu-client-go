@@ -1,0 +1,11 @@
+{
+  "client": {
+    "name": "foo",
+    "address": "192.168.1.1",
+    "subscriptions": [
+      "duplicate",
+      "unique",
+      "duplicate"
+    ]
+  }
+}
