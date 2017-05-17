@@ -12,6 +12,14 @@ import (
 	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
 
+type dummyFlagSet struct{}
+
+func (*dummyFlagSet) BoolVar(_ *bool, _ string, _ bool, _ string)       {}
+func (*dummyFlagSet) StringVar(_ *string, _ string, _ string, _ string) {}
+func (*dummyFlagSet) Parse([]string) error {
+	return nil
+}
+
 func newDummyClient() *stdClient.Client {
 	return &stdClient.Client{
 		Name:          "test_client",
@@ -160,6 +168,10 @@ func TestNewConfigFromFile(t *testing.T) {
 }
 
 func TestNewConfigFromFlagSet(t *testing.T) {
+	origCmdlineParser := cmdlineParser
+	cmdlineParser = &dummyFlagSet{}
+	defer func() { cmdlineParser = origCmdlineParser }()
+
 	dummyClientName := "test_client"
 
 	os.Setenv("SENSU_CLIENT_NAME", dummyClientName)
