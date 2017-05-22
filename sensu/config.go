@@ -3,10 +3,10 @@ package sensu
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
-	"fmt"
 
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
 	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
@@ -54,7 +54,10 @@ func split(str string, token string) []string {
 	return strings.Split(str, token)
 }
 
-func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, error) {
+func NewConfigFromFile(
+	flagset *configFlagSet,
+	configFile string,
+) (*Config, error) {
 	cfg := Config{flagset, &configPayload{}}
 
 	if configFile != "" {
@@ -67,21 +70,13 @@ func NewConfigFromFile(flagset *configFlagSet, configFile string) (*Config, erro
 		if err := json.Unmarshal(buf, &cfg.config); err != nil {
 			return nil, err
 		}
+
+		cfg.addDefaultSubscription()
 	}
 
 	if cfg.Client().Name == "" {
 		return nil, errNoClientName
 	}
-
-	// If we reached this point, we have a client name.
-	// emulate ruby client behavior: add default subscription - client:name
-	// Without at least one subscription sensu server will crash.
-	cfg.config.Client.Subscriptions = removeDuplicates(
-	    append(
-	        cfg.config.Client.Subscriptions,
-	        fmt.Sprintf("client:%s", cfg.config.Client.Name),
-	    ),
-	)
 
 	return &cfg, nil
 }
@@ -124,15 +119,24 @@ func (c *Config) RabbitMQHAConfig() ([]*rabbitmq.TransportConfig, error) {
 }
 
 func (c *Config) Client() *client.Client {
-	if cfg := c.config; cfg != nil && cfg.Client != nil {
-		return cfg.Client
+	if c.config != nil {
+		if c.config.Client != nil {
+			return c.config.Client
+		}
+	} else {
+		c.config = &configPayload{}
 	}
 
-	return &client.Client{
+	// Initialize the config from environment variables
+	c.config.Client = &client.Client{
 		Name:          os.Getenv("SENSU_CLIENT_NAME"),
 		Address:       fetchEnv("SENSU_CLIENT_ADDRESS", "SENSU_ADDRESS"),
 		Subscriptions: split(os.Getenv("SENSU_CLIENT_SUBSCRIPTIONS"), ","),
 	}
+
+	c.addDefaultSubscription()
+
+	return c.config.Client
 }
 
 func (c *Config) Checks() []*check.Check {
@@ -143,6 +147,18 @@ func (c *Config) Checks() []*check.Check {
 	return []*check.Check{}
 }
 
+// addDefaultSubscription emulates ruby client behavior:
+// add default subscription - client:name
+// Without at least one subscription sensu server will crash.
+func (c *Config) addDefaultSubscription() {
+	c.config.Client.Subscriptions = removeDuplicates(
+		append(
+			c.config.Client.Subscriptions,
+			fmt.Sprintf("client:%s", c.config.Client.Name),
+		),
+	)
+}
+
 // Removes duplicates from string slices
 func removeDuplicates(xs []string) []string {
 
@@ -150,11 +166,11 @@ func removeDuplicates(xs []string) []string {
 	result := []string{}
 
 	for _, x := range xs {
-	   temp[x] = true
+		temp[x] = true
 	}
 
 	for k, _ := range temp {
-	  result = append(result, k)
+		result = append(result, k)
 	}
 
 	return result

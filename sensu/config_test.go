@@ -12,10 +12,20 @@ import (
 	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
 )
 
-var dummyClient = &stdClient.Client{
-	Name:          "test_client",
-	Address:       "10.0.0.42",
-	Subscriptions: strings.Split("email,messenger", ","),
+type dummyFlagSet struct{}
+
+func (*dummyFlagSet) BoolVar(_ *bool, _ string, _ bool, _ string)       {}
+func (*dummyFlagSet) StringVar(_ *string, _ string, _ string, _ string) {}
+func (*dummyFlagSet) Parse([]string) error {
+	return nil
+}
+
+func newDummyClient() *stdClient.Client {
+	return &stdClient.Client{
+		Name:          "test_client",
+		Address:       "10.0.0.42",
+		Subscriptions: strings.Split("email,messenger", ","),
+	}
 }
 
 func TestRabbitMQURIDefaultValue(t *testing.T) {
@@ -54,7 +64,11 @@ func TestRabbitMQURIFromConfig(t *testing.T) {
 	)
 }
 
-func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Client, t *testing.T) {
+func validateClient(
+	actualClient *stdClient.Client,
+	expectedClient *stdClient.Client,
+	t *testing.T,
+) {
 	utils.ValidateStringParameter(
 		actualClient.Name,
 		expectedClient.Name,
@@ -69,6 +83,10 @@ func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Cl
 		t,
 	)
 
+	// Sort subscription slices first, because DeepEqual also requires
+	// the order of slices to be equal.
+	sort.Strings(actualClient.Subscriptions)
+	sort.Strings(expectedClient.Subscriptions)
 	if !reflect.DeepEqual(
 		actualClient.Subscriptions,
 		expectedClient.Subscriptions,
@@ -82,12 +100,20 @@ func validateClient(actualClient *stdClient.Client, expectedClient *stdClient.Cl
 }
 
 func TestClientFromConfig(t *testing.T) {
+	dummyClient := newDummyClient()
+
 	config := Config{config: &configPayload{Client: dummyClient}}
 
 	validateClient(config.Client(), dummyClient, t)
 }
 
 func TestClientFromEnvVars(t *testing.T) {
+	dummyClient := newDummyClient()
+	dummyClient.Subscriptions = append(
+		dummyClient.Subscriptions,
+		"client:test_client",
+	)
+
 	os.Setenv("SENSU_CLIENT_NAME", dummyClient.Name)
 	defer os.Unsetenv("SENSU_CLIENT_NAME")
 
@@ -104,16 +130,16 @@ func TestClientFromEnvVars(t *testing.T) {
 }
 
 func TestClientFromEnvVarsNoSubscriptions(t *testing.T) {
-	dummyClientNoSubscriptions := dummyClient
-	dummyClientNoSubscriptions.Subscriptions = []string{}
+	dummyClient := newDummyClient()
+	dummyClient.Subscriptions = []string{"client:test_client"}
 
-	os.Setenv("SENSU_CLIENT_NAME", dummyClientNoSubscriptions.Name)
+	os.Setenv("SENSU_CLIENT_NAME", dummyClient.Name)
 	defer os.Unsetenv("SENSU_CLIENT_NAME")
 
-	os.Setenv("SENSU_CLIENT_ADDRESS", dummyClientNoSubscriptions.Address)
+	os.Setenv("SENSU_CLIENT_ADDRESS", dummyClient.Address)
 	defer os.Unsetenv("SENSU_CLIENT_ADDRESS")
 
-	validateClient((&Config{}).Client(), dummyClientNoSubscriptions, t)
+	validateClient((&Config{}).Client(), dummyClient, t)
 }
 
 func TestChecksFromConfig(t *testing.T) {
@@ -139,6 +165,30 @@ func TestNewConfigFromFile(t *testing.T) {
 	if c, err := NewConfigFromFile(nil, ""); c != nil || err != errNoClientName {
 		t.Errorf("Expected (nil, %v) but got (%v, %v)", errNoClientName, c, err)
 	}
+}
+
+func TestNewConfigFromFlagSet(t *testing.T) {
+	origCmdlineParser := cmdlineParser
+	cmdlineParser = &dummyFlagSet{}
+	defer func() { cmdlineParser = origCmdlineParser }()
+
+	dummyClientName := "test_client"
+
+	os.Setenv("SENSU_CLIENT_NAME", dummyClientName)
+	defer os.Unsetenv("SENSU_CLIENT_NAME")
+
+	cfg, err := NewConfigFromFlagSet(ExtractFlags())
+
+	if err != nil {
+		t.Errorf("Expected error to be nil but got \"%s\" instead", err)
+	}
+
+	utils.ValidateStringParameter(
+		cfg.config.Client.Name,
+		dummyClientName,
+		"client name",
+		t,
+	)
 }
 
 func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
@@ -170,7 +220,6 @@ func TestRabbitMQHAConfigDefaultValue(t *testing.T) {
 }
 
 func TestSubscriptionBehaviour(t *testing.T) {
-
 	for _, tCase := range []struct {
 		in  string
 		out []string
@@ -204,11 +253,9 @@ func TestSubscriptionBehaviour(t *testing.T) {
 			t,
 		)
 	}
-
 }
 
 func validateClientSubscriptions(s1 []string, s2 []string, t *testing.T) {
-
 	sort.Strings(s1)
 	sort.Strings(s2)
 
@@ -220,5 +267,4 @@ func validateClientSubscriptions(s1 []string, s2 []string, t *testing.T) {
 			s2,
 		)
 	}
-
 }
