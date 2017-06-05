@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
+	"github.com/upfluence/sensu-go/sensu/transport/rabbitmq"
 	"github.com/upfluence/sensu-client-go/sensu"
 )
 

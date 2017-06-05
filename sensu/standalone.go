@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/log"
-	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
+	"github.com/upfluence/goutils/log"
+	"github.com/upfluence/sensu-go/sensu/check"
 )
 
 type Standalone struct {

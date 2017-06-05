@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/goutils/testing/utils"
-	"github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
-	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
+	"github.com/upfluence/goutils/testing/utils"
+	"github.com/upfluence/sensu-go/sensu/check"
+	stdClient "github.com/upfluence/sensu-go/sensu/client"
 )
 
 type dummyFlagSet struct{}

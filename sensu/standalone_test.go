@@ -3,8 +3,8 @@ package sensu
 import (
 	"testing"
 
-	stdCheck "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/check"
-	stdClient "github.com/upfluence/sensu-client-go/Godeps/_workspace/src/github.com/upfluence/sensu-go/sensu/client"
+	stdCheck "github.com/upfluence/sensu-go/sensu/check"
+	stdClient "github.com/upfluence/sensu-go/sensu/client"
 )
 
 func TestMissingCommandKey(t *testing.T) {
