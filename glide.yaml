@@ -1,12 +1,13 @@
 package: github.com/upfluence/sensu-client-go
 import:
-- package: github.com/op/go-logging
 - package: github.com/streadway/amqp
 - package: github.com/upfluence/goutils
+  version: ^0.1.0
   subpackages:
   - log
   - testing/utils
 - package: github.com/upfluence/sensu-go
+  version: master
   subpackages:
   - sensu/check
   - sensu/client

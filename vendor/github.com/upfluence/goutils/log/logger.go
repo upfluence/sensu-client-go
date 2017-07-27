@@ -1,22 +1,32 @@
 package log
 
 import (
-	"github.com/op/go-logging"
 	"os"
+
+	"github.com/op/go-logging"
+	"github.com/upfluence/goutils/error_logger"
 )
 
-const defaultLevel = logging.NOTICE
+const (
+	defaultStdoutLevel      = logging.NOTICE
+	defaultErrorLoggerLevel = logging.ERROR
+)
 
 var (
 	logger = &logging.Logger{Module: "upfluence", ExtraCalldepth: 1}
 	format = logging.MustStringFormatter(
 		`[%{level:.1s} %{time:060102 15:04:05} %{shortfile}] %{message}`,
 	)
-	backend = logging.AddModuleLevel(
+
+	stdoutBackend = logging.AddModuleLevel(
 		logging.NewBackendFormatter(
 			logging.NewLogBackend(os.Stdout, "", 0),
 			format,
 		),
+	)
+
+	errBackend = logging.AddModuleLevel(
+		&errorLoggerBackend{client: error_logger.DefaultErrorLogger},
 	)
 )
 
@@ -27,11 +37,13 @@ func init() {
 	)
 
 	if level, err = logging.LogLevel(os.Getenv("LOGGER_LEVEL")); err != nil {
-		level = defaultLevel
+		level = defaultStdoutLevel
 	}
 
-	backend.SetLevel(level, "")
-	logging.SetBackend(backend)
+	stdoutBackend.SetLevel(level, "")
+	errBackend.SetLevel(defaultErrorLoggerLevel, "")
+
+	logging.SetBackend(stdoutBackend, errBackend)
 }
 
 func Fatal(args ...interface{}) {

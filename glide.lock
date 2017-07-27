@@ -1,20 +1,47 @@
-hash: cbe1bde4a166ee0a70c5c7f7204a38badef3489080b896d454f79e33984a52f8
-updated: 2017-06-05T14:33:31.152583153-04:00
+hash: 0aed2c87b184c6982c5707fdbb737f8e88abc49757d20c54473baf07aa54312e
+updated: 2017-07-27T15:02:21.374177287-04:00
 imports:
+- name: github.com/certifi/gocertifi
+  version: 3fd9e1adb12b72d2f3f82191d49be9b93c69f67c
+- name: github.com/cyberdelia/statsd
+  version: b1a41df90100a1421f276a4bacd664803a7b7f0b
+- name: github.com/getsentry/raven-go
+  version: d175f85701dfbf44cb0510114c9943e665e60907
+- name: github.com/hallas/stacko
+  version: f35fc1c0582692ba9aef59e275f0230c0992f9ae
 - name: github.com/op/go-logging
   version: 970db520ece77730c7e4724c61121037378659d9
+- name: github.com/roncohen/opbeat-go
+  version: 958512be4c1d824e3a89d75b47e6f29751a76a3d
 - name: github.com/streadway/amqp
-  version: b4f3ceab0337f013208d31348b578d83c0064744
-- name: github.com/upfluence/goutils
-  version: e8f7112ce74c2e02eca205f14415bab7e02f6c46
+  version: 2cbfe40c9341ad63ba23e53013b3ddc7989d801c
+- name: github.com/upfluence/base
+  version: v0.0.21
   subpackages:
+  - base_service
+  - version
+- name: github.com/upfluence/goutils
+  version: 7956c43448fceffecff0fae54f231aa9eced52e2
+  subpackages:
+  - error_logger
+  - error_logger/noop
+  - error_logger/opbeat
+  - error_logger/sentry
   - log
   - testing/utils
+  - thrift/handler
+  - tracing
+  - tracing/noop
+  - tracing/statsd
 - name: github.com/upfluence/sensu-go
-  version: 99bf03626e3d1c9418969f60a697dc424387b618
+  version: 03cf05d644cdd13277077dee145b339dee6e195a
   subpackages:
   - sensu/check
   - sensu/client
   - sensu/transport
   - sensu/transport/rabbitmq
+- name: github.com/upfluence/thrift
+  version: f593378d777509a16cc0297622318972dfa8cd6e
+  subpackages:
+  - lib/go/thrift
 testImports: []
